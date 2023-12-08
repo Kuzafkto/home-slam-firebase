@@ -124,6 +124,7 @@ export class PlayersService {
             // le hacemos un next al behaviour subject con el array de transformedPlayers
             this._players.next(transformedPlayers);
             }
+            transformedPlayers.sort((a:Player, b:Player) => b.data.id - a.data.id);
             // devolvemos el array de players filtrado y mapeado correctamente
             return transformedPlayers;
           }),

@@ -34,7 +34,7 @@ onTouchedCb?:()=>void;
     { id: 7, name: 'left field' },
     { id: 8, name: 'center field' },
     { id: 9, name: 'right field' },
-    { id: 10, name: 'designated hitter' }
+    { id: 10, name: 'designated hitter'}
   ];
   constructor(private renderer: Renderer2, private el: ElementRef) { }
 

@@ -45,10 +45,10 @@ ion-input {
   font-size: 1.2rem;
   margin-left:2%;
 }
+//no funciona esta clase, probar luego de otra forma como implementarla
 .dragging {
-  opacity: 0.5; /* Por ejemplo, reduce la opacidad durante el arrastre */
-  border: 2px dashed #000; /* Agrega un borde punteado durante el arrastre */
-  /* Otros estilos que desees aplicar durante el arrastre */
+  opacity: 0.5; 
+  border: 2px dashed #000; 
 }
 ion-title{
   font-size: 1.5rem;
@@ -67,7 +67,7 @@ ion-button{
 }
 
 .divider-line {
-  width: 5px; /* Ancho de la línea vertical */
-  height: 100vh; /* Alto de la pantalla */
-  background-color: #009a44; /* Color de la línea */
+  width: 5px; 
+  height: 100vh;
+  background-color: #009a44;
 }

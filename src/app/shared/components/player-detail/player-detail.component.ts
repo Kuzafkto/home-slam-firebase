@@ -81,7 +81,7 @@ export class PlayerDetailComponent  implements OnInit {
       id:[null],
       name:['', [Validators.required]],
       surname:['', [Validators.required]],
-      age:[18, [Validators.required]],//falta el control de edad
+      age:[18, [Validators.required,Validators.min(18)]],
       positions: this.formBuilder.array([])
     });
     

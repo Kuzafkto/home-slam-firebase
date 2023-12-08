@@ -1,4 +1,18 @@
-<!--Version que si deberia de estar-->
+
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="primary" fill="clear" (click)="onCancel()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      {{ mode === 'New' ? 'New Team' : 'Edit Team' }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content  class="page-container">
 
 <div class="form-container">
@@ -6,14 +20,13 @@
 <div class="input-container">
 
     <ion-item>
-      <ion-title>Nombre:</ion-title>
+      <ion-title>{{'teams.name'|translate}}</ion-title>
       <ion-input formControlName="name" type="text"></ion-input>
     </ion-item>
   </div>
 </form>
 
   <div class="dragAndDrop">
-  <!-- Lista de jugadores disponibles -->
   <cdk-drop cdkDropList #availablePlayersList="cdkDropList" [cdkDropListConnectedTo]="[currentTeamList]" [cdkDropListData]="availablePlayersArray" class="players-list" id="availablePlayersList" (cdkDropListDropped)="drop($event)">
 
       <ion-row>
@@ -23,15 +36,12 @@
         </ion-col>
       </ion-row>
 
-      <!--<app-player-info  [showDeleteButton]="false" [player]="player" *ngFor="let player of availablePlayers" cdkDrag class="player-card">
-      </app-player-info>-->
 </cdk-drop>
 
 
-<div class="divider-line"></div> <!-- Divisor vertical -->
+<div class="divider-line"></div>
 
 
-  <!-- Equipo actual -->
   <cdk-drop cdkDropList #currentTeamList="cdkDropList" [cdkDropListConnectedTo]="[availablePlayersList]" [cdkDropListData]="currentTeamPlayersArray" class="team-list" id="currentTeamList" (cdkDropListDropped)="drop($event)">
 
     <ion-row>
@@ -47,5 +57,5 @@
 </ion-content>
 <ion-footer>
   <!--aca se usa el isFormDirty que habíamos declarado antes para chequear si el form es valido o no-->
-  <ion-button  type="submit" [disabled]="!form.valid || !isFormDirty" class="submitButton" expand="full" (click)="onSubmit()">{{(mode=='New'?'Crear':'Guardar')}}</ion-button>
+  <ion-button  type="submit" [disabled]="!form.valid || !isFormDirty" class="submitButton" expand="full" (click)="onSubmit()">{{(mode=='New'?'Create':'Save')}}</ion-button>
 </ion-footer>

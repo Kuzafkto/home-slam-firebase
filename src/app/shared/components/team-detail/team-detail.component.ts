@@ -52,14 +52,6 @@ export class TeamDetailComponent implements OnInit {
           (this.form.get('players') as FormArray).push(new FormControl(player));
         });
 
-      /*_team.data.trainers.forEach(
-        trainer => {
-          this.selectedTrainers.add(trainer.id);
-          (this.form.get('trainers') as FormArray).push(new FormControl(trainer.id));
-        });
-
-      this.initialSelectedTrainers = new Set(this.selectedTrainers);
-      */
     }
   }
   constructor(
@@ -119,7 +111,6 @@ export class TeamDetailComponent implements OnInit {
           this.removePlayer(player,this.currentTeamPlayers);
           this.availablePlayers.add(player);
           this.removeFromFormArray(playerId);
-          //this.cdr.detectChanges();
         });
 
       }
@@ -153,6 +144,7 @@ private removePlayer(player:Player,set:Set<Player>){
 //control del form
 
 //funciones get que convierten el set en arrays con los id para poder hacer el ngFor
+
   get availablePlayersArray(): number[] {
     let availableAsArray=Array.from(this.availablePlayers);
     let availablePlayersId:number[]=[];
@@ -175,7 +167,6 @@ private removePlayer(player:Player,set:Set<Player>){
     return currentTeamId;
   }
 //funciones get que convierten el set en arrays con los id para poder hacer el ngFor
-
 
 
   onCancel() {

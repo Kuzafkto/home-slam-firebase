@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { AuthStrapiService } from 'src/app/core/services/auth-strapi.service';
+import { CustomTranslateService } from 'src/app/core/services/custom-translate.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-toolbar',
@@ -10,17 +12,59 @@ import { AuthStrapiService } from 'src/app/core/services/auth-strapi.service';
 })
 export class AppToolbarComponent  implements OnInit {
 
+  @Input() languages:string[] = ["es","en"];
+  @Input() languageSelected:string = "es";
+  @Output() onSignout = new EventEmitter();
+  @Output() onProfile = new EventEmitter();
+  @Output() onLanguage = new EventEmitter();
+
+  @Input() set username(value: string | undefined) {
+    this._username.next(value || "Kuza Fkto");
+  }
+
+  @Input() set nickname(value: string | undefined) {
+    this._nickname.next(value || "Kuza");
+  }
+  private _username = new BehaviorSubject<string>("Kuza Fkto");
+  username$ = this._username.asObservable();
+
+  private _nickname = new BehaviorSubject<string>("Kuza");
+  nickname$ = this._nickname.asObservable();
+  hidden=false;
   constructor(
     private router:Router,
     private auth: AuthService,
-    private strapi:AuthStrapiService
-  ) { }
-user=""
+    private strapi:AuthStrapiService,
+    private lang:CustomTranslateService
+  ) { /*
+    this.strapi.me().subscribe(user => {
+      this._username.next(user.name);
+      this._nickname.next(user.username);
+    });*/
+  }
   ngOnInit(
     
-  ) {
-    this.strapi.me().subscribe(user=>{
-      this.user=user.name;
+  ) {/*
+     this.strapi.me().subscribe((user) => {
+      this._username.next(user.name);
+      this._nickname.next(user.username);
+    });*/
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        const currentUrl = this.router.url;
+  
+        if (currentUrl === '/login'||currentUrl === '/register') {
+          this.hidden=true;
+          
+        }else{
+          this.hidden=false;
+          this.strapi.me().subscribe((user) => {
+            this._username.next(user.name);
+            this._nickname.next(user.username);
+          });
+        }
+      }
+     
     });
   }
 
@@ -40,4 +84,10 @@ user=""
     this.auth.logout();
     this.router.navigate(['/login']);
   }
+
+  
+  setLanguage(lang:string){
+    this.languageSelected = lang;
+    this.lang.onLanguageChange(lang);
+  } 
 }

@@ -43,7 +43,7 @@ export class PlayersPage implements OnInit {
         {next: player=>{
         //Notificamos con un Toast que se ha pulsado
         const options:ToastOptions = {
-          message:`player deleted`, //mensaje del toast
+          message:`Player deleted`, //mensaje del toast
           duration:1000, // 1 segundo
           position:'bottom', // el toast se situa en la parte inferior
           color:'danger', // color del toast
@@ -65,7 +65,7 @@ export class PlayersPage implements OnInit {
         case 'ok':{
           this.players.updateplayer(info).subscribe(async player=>{
               const options:ToastOptions = {
-              message:"player modified",
+              message:"Player modified",
               duration:1000,
               position:'bottom',
               color:'tertiary',
@@ -79,7 +79,7 @@ export class PlayersPage implements OnInit {
         case 'delete':{
           this.players.deleteplayer(info.data).subscribe(async player=>{
             const options:ToastOptions = {
-            message:"player deleted",
+            message:"Player deleted",
             duration:1000,
             position:'bottom',
             color:'tertiary',
@@ -122,7 +122,7 @@ export class PlayersPage implements OnInit {
         case 'ok':{
           this.players.addplayer(info).subscribe(async player=>{
               const options:ToastOptions = {
-              message:"player created",
+              message:"Player created",
               duration:1000,
               position:'bottom',
               color:'tertiary',

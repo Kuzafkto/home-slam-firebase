@@ -13,6 +13,7 @@ export class RegisterPage implements OnInit {
 
   constructor(
     private auth: AuthService,
+    private router: Router,
   ) { }
 
   ngOnInit() {
@@ -26,5 +27,9 @@ export class RegisterPage implements OnInit {
         console.log(err);
       }
     });
+  }
+
+  goToLoginPage() {
+    this.router.navigate(['/login']);
   }
 }

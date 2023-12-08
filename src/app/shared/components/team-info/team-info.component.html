@@ -10,11 +10,9 @@
       </div>
     </ion-card-header>
     <ion-card-content>
-    <h3>Jugadores</h3>
-    <!-- Estructura adicional para los nombres de los jugadores -->
+    <h3>{{'teams.players'|translate}}</h3>
     <div class="players-container">
       <ng-container *ngFor="let player of team?.data?.players">
-        <!-- Ajustamos el tamaño del contenedor del jugador y del nombre -->
         <div class="player-container">
           <ion-text color="medium" class="player-name">{{ player.name |name:8}}</ion-text>
         </div>

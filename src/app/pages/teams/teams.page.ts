@@ -34,7 +34,7 @@ export class TeamsPage implements OnInit {
         case 'ok':{
           this.teams.addTeam(info).subscribe(async player=>{
               const options:ToastOptions = {
-              message:"team created",
+              message:"Team created",
               duration:1000,
               position:'bottom',
               color:'tertiary',
@@ -61,7 +61,7 @@ export class TeamsPage implements OnInit {
         case 'ok':{
           this.teams.updateTeam(info).subscribe(async team=>{
               const options:ToastOptions = {
-              message:"team modified",
+              message:"Team modified",
               duration:1000,
               position:'bottom',
               color:'tertiary',
@@ -76,7 +76,7 @@ export class TeamsPage implements OnInit {
         case 'delete':{
           this.teams.deleteTeam(info.data).subscribe(async team=>{
             const options:ToastOptions = {
-            message:"team deleted",
+            message:"Team deleted",
             duration:1000,
             position:'bottom',
             color:'tertiary',

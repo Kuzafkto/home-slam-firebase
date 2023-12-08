@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
-import { MyUppercasePipe } from './myuppercase.pipe';
 import { SharedModule } from '../../shared/shared.module';
 
 
@@ -15,6 +14,6 @@ import { SharedModule } from '../../shared/shared.module';
     HomePageRoutingModule
   ],
   exports:[HomePage],
-  declarations: [HomePage, MyUppercasePipe]
+  declarations: [HomePage]
 })
 export class HomePageModule {}

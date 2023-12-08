@@ -18,12 +18,12 @@ export class PositionImageDirective implements OnInit {
 
   ngOnInit() {
     // Seleccionar un nombre de imagen aleatorio de la matriz
-    let randomImageId = this.getPositionId(this.position);
+    let positionImageID = this.getPositionId(this.position);
 
     // Realizar una llamada HTTP para obtener la imagen aleatoria
-    this.api.get(`/upload/files/${randomImageId}`).subscribe(result => {
-      let randomUrl = result?.formats?.thumbnail?.url || 'https://res.cloudinary.com/dxvp0tyf0/image/upload/v1701952633/small_unknown_ec725c380f.png';
-      this.applyBackgroundImage(randomUrl);
+    this.api.get(`/upload/files/${positionImageID}`).subscribe(result => {
+      let positionUrl = result?.formats?.thumbnail?.url || 'https://res.cloudinary.com/dxvp0tyf0/image/upload/v1701952633/small_unknown_ec725c380f.png';
+      this.applyBackgroundImage(positionUrl);
     });
   }
 
@@ -35,7 +35,6 @@ export class PositionImageDirective implements OnInit {
     this.renderer.setStyle(this.el.nativeElement, 'width', '70px');
     this.renderer.setStyle(this.el.nativeElement, 'height', '70px');
     this.renderer.setStyle(this.el.nativeElement, 'border-radius', '50%');
-    this.renderer.setStyle(this.el.nativeElement.firstChild, 'border-radius', '50%');
   }
   
 

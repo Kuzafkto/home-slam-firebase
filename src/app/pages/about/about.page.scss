@@ -5,28 +5,37 @@
   }
   
   .about-image {
-    margin-top: 2%;
-    height: 50%; /* Ajusta el tamaño de la imagen según tus preferencias */
+    margin:2%;
+    height: 50%; 
   }
   
   .about-title {
-    font-size: 2.5rem; /* Ajusta el tamaño del título según tus preferencias */
+    font-size: 2.5rem;
   }
   
   .about-description {
-    font-size: 1.5rem; /* Ajusta el tamaño del texto de descripción según tus preferencias */
+    font-size: 1.5rem;
     text-align: center;
   }
   
   .about-buttons {
     margin-top: 2%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   
   .about-button-col {
     padding: 0 5px;
+    flex: 1;
   }
   
   .about-button {
-    font-size: 1.8rem; /* Ajusta el tamaño de los botones según tus preferencias */
+    font-size: 1.5rem;
+    border-radius: 5px; //no funciona :c
+  }
+
+  ion-button{
+    border-radius: 5px; //no funciona :c
   }
   

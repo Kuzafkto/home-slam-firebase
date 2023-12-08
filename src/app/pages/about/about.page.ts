@@ -17,5 +17,7 @@ userUrl="";
     this.userUrl=result.items[0].avatar_url;
    });
   }
-
+  openLink(link:string){
+    window.open(link,'_blank')
+  }
 }

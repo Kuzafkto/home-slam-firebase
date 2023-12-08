@@ -27,38 +27,29 @@ h3 {
   text-align: center;
 }
 
-/* Nueva clase para la estructura de los nombres de los jugadores */
-/* ... Otros estilos ... */
-
 .player-container {
-  display: inline-block; /* Hace que el contenedor se ajuste al contenido */
+  display: inline-block; 
   border-radius: 5%;
   background-color: #7e4d32;
   margin: 10px;
   padding: 2%;
-  overflow: hidden; /* Evita que el texto sobresalga del contenedor */
+  overflow: hidden;
 }
 
 ion-text.player-name {
   color: white;
   text-align: center;
   font-size: 1.5rem;
-  white-space: nowrap; /* Evita que el texto se divida en varias líneas */
-  overflow: hidden; /* Manejo de desbordamiento */
-  text-overflow: ellipsis; /* Agrega puntos suspensivos (...) si el texto es demasiado largo */
+  white-space: nowrap;//espacios en blanco no hagan wrap pls
 }
 
-/* ... Otros estilos ... */
-
-
-/* Estilo del círculo alrededor del nombre del jugador */
 .player-circle {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px; /* Puedes ajustar el tamaño del círculo según sea necesario */
+  width: 40px; 
   height: 40px;
   border-radius: 50%;
-  background-color: #009A44; /* Puedes ajustar el color del círculo según sea necesario */
-  margin: 5px; /* Ajusta el espacio entre los círculos */
+  background-color: #009A44; 
+  margin: 5px;
 }
