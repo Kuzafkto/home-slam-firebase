@@ -7,7 +7,7 @@
         </ion-button>
       </ion-buttons>
       <ion-title>
-        {{ mode === 'New' ? 'New Player' : 'Edit Player' }}
+        {{'players.title'|translate}}
       </ion-title>
     </ion-toolbar>
   </ion-header>
@@ -35,7 +35,7 @@
 
   <ion-footer>
     <!--aca se usa el isFormDirty que habíamos declarado antes para chequear si el form es valido o no-->
-    <ion-button  type="submit" [disabled]="!form.valid || !isFormDirty" class="submitButton" expand="full" (click)="onSubmit()">{{(mode=='New'?'Create':'Save')}}</ion-button>
+    <ion-button  type="submit" [disabled]="!form.valid || !isFormDirty" class="submitButton" expand="full" (click)="onSubmit()">{{'players.submit'|translate}}</ion-button>
   </ion-footer>
   <!--[disabled]="!form.valid || !isFormDirty"-->
 

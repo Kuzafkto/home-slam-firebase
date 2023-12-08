@@ -54,12 +54,16 @@
         "age":"Age: ",
         "create":"Create",
         "save":"Save",
-        "ageError":"Age has to be 18 minimum"
+        "ageError":"Age has to be 18 minimum",
+        "title":"Players",
+        "submit":"Submit"
     },
     "teams":{
         "new":"New Team",
         "edit":"Edit Team",
         "name":"Name: ",
-        "players":"Players"
+        "players":"Players",
+        "title":"Teams",
+        "submit":"Submit"
     }
 }
