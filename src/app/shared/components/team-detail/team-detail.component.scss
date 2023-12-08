@@ -27,8 +27,10 @@
   flex: 1; // ocupa toda la row
   height: 100%;
   overflow: hidden;
-  margin:2%
+  margin:2%;
 }
+
+
 .players-list,
 .team-list {
   flex: 1; // las dos listas usan la misma cant de espacio
@@ -62,4 +64,10 @@ ion-button{
 }
 .submitButton{
   font-size: 2rem;
+}
+
+.divider-line {
+  width: 5px; /* Ancho de la línea vertical */
+  height: 100vh; /* Alto de la pantalla */
+  background-color: #009a44; /* Color de la línea */
 }

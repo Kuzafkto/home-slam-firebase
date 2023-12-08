@@ -11,6 +11,7 @@ import { TeamDetailComponent } from 'src/app/shared/components/team-detail/team-
 })
 export class TeamsPage implements OnInit {
 
+  public loading:boolean = false;
 
   
   constructor(
@@ -20,7 +21,9 @@ export class TeamsPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.loading = true;
     this.teams.getAll().subscribe(results=>{
+      this.loading = false;
     });
   }
 

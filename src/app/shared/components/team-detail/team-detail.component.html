@@ -15,20 +15,37 @@
   <div class="dragAndDrop">
   <!-- Lista de jugadores disponibles -->
   <cdk-drop cdkDropList #availablePlayersList="cdkDropList" [cdkDropListConnectedTo]="[currentTeamList]" [cdkDropListData]="availablePlayersArray" class="players-list" id="availablePlayersList" (cdkDropListDropped)="drop($event)">
-    <div>
-      <app-player-info [player]="player" *ngFor="let player of availablePlayers" cdkDrag class="player-card">
-      </app-player-info>
-  </div>
+
+      <ion-row>
+        <ion-col size="12" size-md="10" size-lg="6" size-xl="4" *ngFor="let player of availablePlayers; let i = index">
+          <app-player-info [showDeleteButton]="false" [player]="player" cdkDrag class="player-card">
+          </app-player-info>
+        </ion-col>
+      </ion-row>
+
+      <!--<app-player-info  [showDeleteButton]="false" [player]="player" *ngFor="let player of availablePlayers" cdkDrag class="player-card">
+      </app-player-info>-->
 </cdk-drop>
+
+
+<div class="divider-line"></div> <!-- Divisor vertical -->
+
 
   <!-- Equipo actual -->
   <cdk-drop cdkDropList #currentTeamList="cdkDropList" [cdkDropListConnectedTo]="[availablePlayersList]" [cdkDropListData]="currentTeamPlayersArray" class="team-list" id="currentTeamList" (cdkDropListDropped)="drop($event)">
-      <app-player-info *ngFor="let player of currentTeamPlayers" cdkDrag class="player-card"
-      [player]="player">
-      </app-player-info>
+
+    <ion-row>
+      <ion-col size="12" size-md="10" size-lg="6" size-xl="4" *ngFor="let player of currentTeamPlayers; let i = index">
+        <app-player-info [showDeleteButton]="false" cdkDrag class="player-card"
+        [player]="player">
+        </app-player-info>
+      </ion-col>
+    </ion-row>
   </cdk-drop>
 </div>
 </div>
-  <ion-button expand="full" class="submitButton" type="submit" (click)="onSubmit()" [disabled]="!form.valid || !isFormDirty">Guardar</ion-button>
 </ion-content>
-
+<ion-footer>
+  <!--aca se usa el isFormDirty que habíamos declarado antes para chequear si el form es valido o no-->
+  <ion-button  type="submit" [disabled]="!form.valid || !isFormDirty" class="submitButton" expand="full" (click)="onSubmit()">{{(mode=='New'?'Crear':'Guardar')}}</ion-button>
+</ion-footer>

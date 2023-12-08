@@ -12,7 +12,8 @@ export class PlayerInfoComponent  implements OnInit {
   @Input()  player:Player | null=null;
   @Output() onCardClicked:EventEmitter<void> = new EventEmitter<void>();
   @Output() onDeleteClicked:EventEmitter<void> = new EventEmitter<void>();
-  
+  @Input() showDeleteButton: boolean = true;
+
   url:any;
 
   ngOnInit() {

@@ -9,7 +9,7 @@ import { HttpClientProvider } from 'src/app/core/services/http-client.provider';
 export class AboutPage implements OnInit {
 
   constructor(
-    private http:HttpClientProvider
+    private http:HttpClientProvider,
   ) { }
 userUrl="";
   ngOnInit() {
