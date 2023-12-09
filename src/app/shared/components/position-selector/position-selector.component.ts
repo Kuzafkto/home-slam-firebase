@@ -1,4 +1,3 @@
-import { ForwardRefHandling } from '@angular/compiler';
 import { Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Position } from 'src/app/core/interfaces/player';
@@ -35,7 +34,7 @@ onTouchedCb?:()=>void;
     { id: 8, name: 'center field' },
     { id: 9, name: 'right field' },
   ];
-  constructor(private renderer: Renderer2, private el: ElementRef) { }
+  constructor() { }
 
   
   addPosition(position:Position):void{
