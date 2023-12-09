@@ -69,6 +69,7 @@ export class PlayersService {
   public query(q: string): Observable<Player[]> {
     // Si coincide el tipo de datos que recibo con mi interfaz
     //note: falta hacer el populate con positions y el mapeo antes de devolverlo?
+    //note: aun no se usa la query
     return this.api.get('/api/extended-players?q=' + q);
   }
 

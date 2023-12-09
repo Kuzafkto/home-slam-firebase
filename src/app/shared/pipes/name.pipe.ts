@@ -9,8 +9,7 @@ export class NamePipe implements PipeTransform {
     if (value) {
     let firstLetterCapital = value.charAt(0).toUpperCase() + value.slice(1);
 
-
-    if(firstLetterCapital.length>15){
+    if(firstLetterCapital.length>limit){
       return firstLetterCapital.substring(0, limit) + '... '
     }else{
       return firstLetterCapital
