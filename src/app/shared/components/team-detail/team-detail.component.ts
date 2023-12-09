@@ -84,7 +84,7 @@ export class TeamDetailComponent implements OnInit {
   }
 
 
-  drop(event: CdkDragDrop<number[]>) {
+  /*drop(event: CdkDragDrop<number[]>) {
     const previousContainerData = Array.from(event.previousContainer.data);
     const currentContainerData = Array.from(event.container.data);
     console.log("previousContainerData: "+previousContainerData+"\ncurrentContainerData: "+currentContainerData);
@@ -115,8 +115,36 @@ export class TeamDetailComponent implements OnInit {
 
       }
     }
-  }
+  }*/
+  drop(event: CdkDragDrop<number[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      let playerId = event.previousContainer.data[event.previousIndex];
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
 
+      if (event.previousContainer.id === 'availablePlayersList'){
+        this.playerSvc.getplayer(playerId).subscribe(player=>{
+          this.currentTeamPlayers.add(player);
+          this.removePlayer(player,this.availablePlayers);
+          this.addToFormArray(player);
+          });
+      }else{
+        this.playerSvc.getplayer(playerId).subscribe(player=>{
+          this.removePlayer(player,this.currentTeamPlayers);
+          this.availablePlayers.add(player);
+          this.removeFromFormArray(playerId);
+        });
+      }
+   
+      console.log(event.previousIndex)
+    }
+  }
 private removePlayer(player:Player,set:Set<Player>){
   const playerIdToRemove = player.data.id; // El ID del jugador a eliminar
 
