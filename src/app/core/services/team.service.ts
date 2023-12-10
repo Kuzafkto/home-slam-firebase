@@ -98,7 +98,7 @@ export class TeamService {
   }
 
   public addTeam(team: Team): Observable<Team> {
-    //test, falta mucho como añadir el team al extended user pero el post funciona
+    //ya funciona :)
     let players = team.data.players.map((player: any) => {
       return {
         id: player.data.id

@@ -13,7 +13,6 @@ import { AuthStrapiService } from './core/services/auth-strapi.service';
 })
 export class AppComponent{
   lang:string = "es";
-  user:User|undefined = undefined;//??
   constructor(
     public translate:CustomTranslateService,
     public auth:AuthService,
