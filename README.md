@@ -53,11 +53,11 @@ Una página de login
 
 Una página de registro
 
-Una página de horme
+Una página de home
 
 Una página de about.
 
-Una página por cada modelo de datos
+Una página por cada modelo de datos.
 
 (se implementa una guarda para que no se pueda acceder sin estar autenticado)
 
@@ -67,7 +67,7 @@ Tu app debe es responsive en casi su totalidad por ciertos fallos a la hora de a
 
 
 
-Para el backend está publicado a traves de render la app esta subida a Netlify a traves del siguiente enlace
+Para el backend está publicado a traves de render la app esta subida a Netlify a través de los enlaces publicados al final.
 
 ## Colores principalmente usados
 
