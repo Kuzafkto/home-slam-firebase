@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClientProvider } from 'src/app/core/services/http-client.provider';
+import { HttpClientProvider } from 'src/app/core/services/http/http-client.provider';
 
 @Component({
   selector: 'app-about',

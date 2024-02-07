@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { AuthService } from 'src/app/core/services/auth.service';
-import { AuthStrapiService } from 'src/app/core/services/auth-strapi.service';
 import { CustomTranslateService } from 'src/app/core/services/custom-translate.service';
 import { BehaviorSubject } from 'rxjs';
+import { AuthService } from 'src/app/core/services/api/auth.service';
 
 @Component({
   selector: 'app-toolbar',
@@ -34,7 +33,6 @@ export class AppToolbarComponent  implements OnInit {
   constructor(
     private router:Router,
     private auth: AuthService,
-    private strapi:AuthStrapiService,
     private lang:CustomTranslateService
   ) { /*
     this.strapi.me().subscribe(user => {
@@ -58,7 +56,7 @@ export class AppToolbarComponent  implements OnInit {
           
         }else{
           this.hidden=false;
-          this.strapi.me().subscribe((user) => {
+          this.auth.me().subscribe((user) => {
             this._username.next(user.name);
             this._nickname.next(user.username);
           });

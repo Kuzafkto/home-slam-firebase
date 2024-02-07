@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, ToastController, ToastOptions } from '@ionic/angular';
 import { Player } from 'src/app/core/interfaces/player';
-import { AuthService } from 'src/app/core/services/auth.service';
-import { PlayersService } from 'src/app/core/services/player.service';
+import { AuthService } from 'src/app/core/services/api/auth.service';
+import { PlayersService } from 'src/app/core/services/api/player.service';
 import { PlayerDetailComponent } from 'src/app/shared/components/player-detail/player-detail.component';
 
 @Component({

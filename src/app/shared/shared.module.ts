@@ -11,12 +11,12 @@ import { PlayerDetailComponent } from './components/player-detail/player-detail.
 import { TeamDetailComponent } from './components/team-detail/team-detail.component';
 import { TeamInfoComponent } from './components/team-info/team-info.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { AppToolbarComponent } from './components/app-toolbar/app-toolbar.component';
 import { PositionSelectorComponent } from './components/position-selector/position-selector.component';
 import { NamePipe } from './pipes/name.pipe';
 import { PositionImageDirective } from './directives/position-image.directive';
 import {TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { createTranslateLoader } from '../core/services/custom-translate.service';
+import { AppToolbarComponent } from './components/app-toolbar/app-toolbar.component';
 
 
 
@@ -63,12 +63,12 @@ import { createTranslateLoader } from '../core/services/custom-translate.service
     //Pipes
     //Components
     PlayerDetailComponent,
+    AppToolbarComponent,
     LoginFormComponent,
     RegisterFormComponent,
     PlayerInfoComponent,
     TeamDetailComponent,
     TeamInfoComponent,
-    AppToolbarComponent,
     PositionSelectorComponent,
     PositionImageDirective,
     TranslateModule,

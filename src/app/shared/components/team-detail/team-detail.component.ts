@@ -6,8 +6,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { ModalController } from '@ionic/angular';
 import { Player } from 'src/app/core/interfaces/player';
 import { Team } from 'src/app/core/interfaces/team';
-import { PlayersService } from 'src/app/core/services/player.service';
-
+import { PlayersService } from 'src/app/core/services/api/player.service';
 @Component({
   selector: 'app-team-detail',
   templateUrl: './team-detail.component.html',
@@ -23,13 +22,13 @@ export class TeamDetailComponent implements OnInit {
   //para controlar el form
   initialPlayers = new Set<Player>();
 
-  availablePlayers= new Set<Player>();
+  availablePlayers = new Set<Player>();
 
   /*selectedTrainers = new Set<number>();
 
   //para controlar el form
   initialSelectedTrainers = new Set<number>();*/
-  name: string="";
+  name: string = "";
 
   @Input() set team(_team: Team | null) {
     if (_team) {
@@ -44,7 +43,7 @@ export class TeamDetailComponent implements OnInit {
         player => {
           //objeto de tipo player a base del get 
           //primero nos suscribimos y a la suscripcion haccemos el add
-          this.playerSvc.getplayer(player.id).subscribe(playerData=>{
+          this.playerSvc.getplayer(player.id).subscribe((playerData: Player) => {
             this.currentTeamPlayers.add(playerData);
             this.initialPlayers.add(playerData);
           });
@@ -69,18 +68,18 @@ export class TeamDetailComponent implements OnInit {
 
   ngOnInit() {
     this.playerSvc.getAll().subscribe(
-      players => {
-        let initialPlayersArray= Array.from(this.initialPlayers);
+      (players: any[]) => {
+        let initialPlayersArray = Array.from(this.initialPlayers);
         players.forEach(player => {
-          if(initialPlayersArray.some((p:Player)=> p.data.id===player.data.id)){
-            this.removePlayer(player,this.availablePlayers);
-          }else{
+          if (initialPlayersArray.some((p: Player) => p.id === player.data.id)) {
+            this.removePlayer(player, this.availablePlayers);
+          } else {
             this.availablePlayers.add(player);
           }
         });
       }
     );
-    this.name=this.form.get('name')?.value;
+    this.name = this.form.get('name')?.value;
   }
 
 
@@ -128,37 +127,37 @@ export class TeamDetailComponent implements OnInit {
         event.currentIndex,
       );
 
-      if (event.previousContainer.id === 'availablePlayersList'){
-        this.playerSvc.getplayer(playerId).subscribe(player=>{
+      if (event.previousContainer.id === 'availablePlayersList') {
+        this.playerSvc.getplayer(playerId).subscribe((player: Player) => {
           this.currentTeamPlayers.add(player);
-          this.removePlayer(player,this.availablePlayers);
+          this.removePlayer(player, this.availablePlayers);
           this.addToFormArray(player);
-          });
-      }else{
-        this.playerSvc.getplayer(playerId).subscribe(player=>{
-          this.removePlayer(player,this.currentTeamPlayers);
+        });
+      } else {
+        this.playerSvc.getplayer(playerId).subscribe((player: Player) => {
+          this.removePlayer(player, this.currentTeamPlayers);
           this.availablePlayers.add(player);
           this.removeFromFormArray(playerId);
         });
       }
-   
+
       console.log(event.previousIndex)
     }
   }
-private removePlayer(player:Player,set:Set<Player>){
-  const playerIdToRemove = player.data.id; // El ID del jugador a eliminar
+  private removePlayer(player: Player, set: Set<Player>) {
+    const playerIdToRemove = player.id; // El ID del jugador a eliminar
 
-  // Encuentra el objeto Player específico en el conjunto que coincida con el ID
-  const playerToRemove = Array.from(set).find(player => player.data.id === playerIdToRemove);
-  
-  if (playerToRemove) {
-   set.delete(playerToRemove);
+    // Encuentra el objeto Player específico en el conjunto que coincida con el ID
+    const playerToRemove = Array.from(set).find(player => player.id === playerIdToRemove);
+
+    if (playerToRemove) {
+      set.delete(playerToRemove);
+    }
   }
-}
-//control del form 
+  //control del form 
   private removeFromFormArray(playerId: number) {
     const playersArray = this.form.get('players') as FormArray;
-    const index = playersArray.controls.findIndex((player:any) => player.value.id === playerId);
+    const index = playersArray.controls.findIndex((player: any) => player.value.id === playerId);
     if (index !== -1) {
       playersArray.removeAt(index);
     }
@@ -169,32 +168,33 @@ private removePlayer(player:Player,set:Set<Player>){
     const playersArray = this.form.get('players') as FormArray;
     playersArray.push(new FormControl(playerId));
   }
-//control del form
+  //control del form
 
-//funciones get que convierten el set en arrays con los id para poder hacer el ngFor
+  //funciones get que convierten el set en arrays con los id para poder hacer el ngFor
 
   get availablePlayersArray(): number[] {
-    let availableAsArray=Array.from(this.availablePlayers);
-    let availablePlayersId:number[]=[];
+    let availableAsArray = Array.from(this.availablePlayers);
+    let availablePlayersId: number[] = [];
 
     availableAsArray.forEach(player => {
-      availablePlayersId.push(player.data.id);
+      if (player.id)
+        availablePlayersId.push(player.id);
     });
 
     return availablePlayersId;
   }
 
-  get currentTeamPlayersArray():number[]{
-    let currentTeamAsArray=Array.from(this.currentTeamPlayers);
-    let currentTeamId:number[]=[];
+  get currentTeamPlayersArray(): number[] {
+    let currentTeamAsArray = Array.from(this.currentTeamPlayers);
+    let currentTeamId: number[] = [];
 
     currentTeamAsArray.forEach(player => {
-      currentTeamId.push(player.data.id);
+      currentTeamId.push(player.id);
     });
 
     return currentTeamId;
   }
-//funciones get que convierten el set en arrays con los id para poder hacer el ngFor
+  //funciones get que convierten el set en arrays con los id para poder hacer el ngFor
 
 
   onCancel() {
@@ -216,10 +216,10 @@ private removePlayer(player:Player,set:Set<Player>){
   }
 
   get isFormDirty(): boolean {
-    return this.form.get('name')?.value!=this.name || !this.areSetsEqual(this.currentTeamPlayers, this.initialPlayers);
+    return this.form.get('name')?.value != this.name || !this.areSetsEqual(this.currentTeamPlayers, this.initialPlayers);
   }
 
-  areSetsEqual(setA:Set<Player>, setB:Set<Player>) {
+  areSetsEqual(setA: Set<Player>, setB: Set<Player>) {
     //si los dos sets no tienen el mismo tamaño entonces no pueden ser iguales, return false
     if (setA.size !== setB.size) return false;
     //ahora chequeamos por cada item del setA, si el setB no lo tiene, return false

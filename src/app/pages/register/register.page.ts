@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { UserRegisterInfo } from '../../core/interfaces/user-register-info';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '../../core/services/api/auth.service';
 
 @Component({
   selector: 'app-register',

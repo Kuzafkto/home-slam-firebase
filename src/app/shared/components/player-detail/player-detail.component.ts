@@ -8,27 +8,27 @@ import { Player, Position } from 'src/app/core/interfaces/player';
   templateUrl: './player-detail.component.html',
   styleUrls: ['./player-detail.component.scss'],
 })
-export class PlayerDetailComponent  implements OnInit {
+export class PlayerDetailComponent implements OnInit {
 
-  form:FormGroup;
-  mode:'New'|'Edit' = 'New';
+  form: FormGroup;
+  mode: 'New' | 'Edit' = 'New';
 
   //Tenmos dos sets (los sets son como listas pero los valores no se pueden repetir) para las posiciones para ir chequeando si el inicial es igual que el que el usuario irá modificando
-    selectedPositions = new Set<number>();
+  selectedPositions = new Set<number>();
   initialSelectedPositions = new Set<number>();
-   name: string="";
-  surname:string="";
-  age:number=18;
-  @Input() set player(_player:Player|null){
-    if(_player){
+  name: string = "";
+  surname: string = "";
+  age: number = 18;
+  @Input() set player(_player: Player | null) {
+    if (_player) {
       this.mode = 'Edit';
-      this.form.controls['id'].setValue(_player.data.id);
-      this.form.controls['name'].setValue(_player.data.name);
-      this.form.controls['surname'].setValue(_player.data.surname);
-      this.form.controls['age'].setValue(_player.data.age);
-  
+      this.form.controls['id'].setValue(_player.id);
+      this.form.controls['name'].setValue(_player.name);
+      this.form.controls['surname'].setValue(_player.surname);
+      this.form.controls['age'].setValue(_player.age);
+
       this.selectedPositions.clear();
-      _player.data.positions.forEach(position => {
+      _player.positions.forEach(position => {
         this.selectedPositions.add(position.id);
         (this.form.get('positions') as FormArray).push(new FormControl(position.id));
       });
@@ -36,19 +36,19 @@ export class PlayerDetailComponent  implements OnInit {
     }
   }
 
-  
+
   //Array con todas las posiciones para mostrar en el template
 
-  allPositions :Position[]= [
+  allPositions: Position[] = [
     { id: 1, name: 'pitcher' },
     { id: 2, name: 'catcher' },
-    { id: 3, name: 'first base' },
-    { id: 4, name: 'second base' },
-    { id: 5, name: 'third base' },
+    { id: 3, name: 'firstBase' },
+    { id: 4, name: 'secondBase' },
+    { id: 5, name: 'thirdBase' },
     { id: 6, name: 'shortstop' },
-    { id: 7, name: 'left field' },
-    { id: 8, name: 'center field' },
-    { id: 9, name: 'right field' },
+    { id: 7, name: 'leftField' },
+    { id: 8, name: 'centerField' },
+    { id: 9, name: 'rightField' },
   ];
 
   // Chequea si la posicion esta seleccionada (se usa para los botones)
@@ -71,59 +71,59 @@ export class PlayerDetailComponent  implements OnInit {
       this.selectedPositions.add(positionId);
     }
   }
-  
+
   constructor(
-    private _modal:ModalController,
-    private formBuilder:FormBuilder
-  ) { 
+    private _modal: ModalController,
+    private formBuilder: FormBuilder
+  ) {
     this.form = this.formBuilder.group({
-      id:[null],
-      name:['', [Validators.required]],
-      surname:['', [Validators.required]],
-      age:[18, [Validators.required,Validators.min(18)]],
+      id: [null],
+      name: ['', [Validators.required]],
+      surname: ['', [Validators.required]],
+      age: [18, [Validators.required, Validators.min(18)]],
       positions: this.formBuilder.array([])
     });
-    
+
   }
 
   ngOnInit() {
-     this.name=this.form.get('name')?.value;
-     this.surname=this.form.get('surname')?.value;
-     this.age=this.form.get('age')?.value;
+    this.name = this.form.get('name')?.value;
+    this.surname = this.form.get('surname')?.value;
+    this.age = this.form.get('age')?.value;
   }
 
-  onCancel(){
+  onCancel() {
     this._modal.dismiss(null, 'cancel');
   }
 
-  onSubmit(){
+  onSubmit() {
     this._modal.dismiss(this.form.value, 'ok');
-  } 
+  }
 
-  onDelete(){
+  onDelete() {
     this._modal.dismiss(this.form.value, 'delete');
   }
 
-  hasError(control:string, error:string):boolean{
+  hasError(control: string, error: string): boolean {
     let errors = this.form.controls[control].errors;
-    return errors!=null && error in errors;
-  
+    return errors != null && error in errors;
+
   }
 
-updateSelected(set:Set<number>){
-  this.selectedPositions=set;
-}
+  updateSelected(set: Set<number>) {
+    this.selectedPositions = set;
+  }
 
   //chequea si el formulario esta sucio, es necesario esta funcion porque el .dirty por defecto no tiene en cuenta los formArray por lo que chequearemos si los sets de las posiciones iniciales y las "cambiadas" son los mismos
   get isFormDirty(): boolean {
     console.log(this.form.get('name')?.value);
-    return (this.form.get('name')?.value!=this.name||this.form.get('surname')?.value!=this.surname||this.form.get('age')?.value!=this.age)|| !this.areSetsEqual(this.selectedPositions, this.initialSelectedPositions);
+    return (this.form.get('name')?.value != this.name || this.form.get('surname')?.value != this.surname || this.form.get('age')?.value != this.age) || !this.areSetsEqual(this.selectedPositions, this.initialSelectedPositions);
   }
 
 
 
   //esta fumada chequea si dos sets de tipo string son iguales
-  areSetsEqual(setA:Set<number>, setB:Set<number>) {
+  areSetsEqual(setA: Set<number>, setB: Set<number>) {
     //si los dos sets no tienen el mismo tamaño entonces no pueden ser iguales, return false
     if (setA.size !== setB.size) return false;
     //ahora chequeamos por cada item del setA, si el setB no lo tiene, return false
@@ -141,5 +141,5 @@ updateSelected(set:Set<number>){
 
 
 
- 
+
 

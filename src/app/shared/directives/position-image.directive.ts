@@ -1,5 +1,5 @@
 import { Directive, ElementRef, Renderer2, OnInit, Input } from '@angular/core';
-import { ApiService } from 'src/app/core/services/api.service';
+import { ApiService } from 'src/app/core/services/api/api.service';
 
 @Directive({
   selector: '[positionImage]'

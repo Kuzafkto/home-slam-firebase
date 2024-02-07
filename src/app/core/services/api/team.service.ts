@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, switchMap, throwError } from 'rxjs';
-import { Team } from '../interfaces/team';
+import { Team } from '../../interfaces/team';
 import { ApiService } from './api.service';
-import { AuthStrapiService } from './auth-strapi.service';
+import { AuthService } from './auth.service';
+import { AuthStrapiService } from './strapi/auth-strapi.service';
+AuthStrapiService
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +16,7 @@ export class TeamService {
 
   constructor(
     private api: ApiService,
-    private auth: AuthStrapiService
+    private auth: AuthService
   ) { }
 
   public getteam(id: number): Observable<Team> {

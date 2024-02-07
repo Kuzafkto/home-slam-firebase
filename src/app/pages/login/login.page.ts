@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { UserCredentials } from 'src/app/core/interfaces/user-credentials';
 import { UserRegisterInfo } from 'src/app/core/interfaces/user-register-info';
-import { AuthService } from 'src/app/core/services/auth.service';
+import { AuthService } from 'src/app/core/services/api/auth.service';
 import { LoginFormComponent } from 'src/app/shared/components/login-form/login-form.component';
 
 @Component({
@@ -23,7 +23,8 @@ export class LoginPage implements OnInit {
   onLogin(credentials: UserCredentials) {
     this.auth.login(credentials).subscribe({
       next: data => {
-
+        this.router.navigate(['/home'])
+        console.log(data);
       },
       error: err => {
         console.log(err);

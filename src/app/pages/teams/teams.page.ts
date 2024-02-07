@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, ToastController, ToastOptions } from '@ionic/angular';
 import { Team } from 'src/app/core/interfaces/team';
-import { TeamService } from 'src/app/core/services/team.service';
+import { TeamService } from 'src/app/core/services/api/team.service';
 import { TeamDetailComponent } from 'src/app/shared/components/team-detail/team-detail.component';
 
 @Component({
