@@ -6,15 +6,15 @@
   <div class="card-container">
     <ion-card-header>
       <div class="team-name-container">
-        <div class="ion-margin-start team-name">{{team?.data?.name | name:12}}</div>
+        <div class="ion-margin-start team-name">{{team?.name | name:12}}</div>
       </div>
     </ion-card-header>
     <ion-card-content>
     <h3>{{'teams.players'|translate}}</h3>
     <div class="players-container">
-      <ng-container *ngFor="let player of team?.data?.players">
+      <ng-container *ngFor="let player of players">
         <div class="player-container">
-          <ion-text color="medium" class="player-name">{{ player.name |name:8}}</ion-text>
+          <ion-text color="medium" class="player-name">{{ player.name|name:8}}</ion-text>
         </div>
       </ng-container>
     </div>

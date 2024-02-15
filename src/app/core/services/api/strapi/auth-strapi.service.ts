@@ -8,7 +8,9 @@ import { AuthService } from '../auth.service';
 import { StrapiArrayResponse, StrapiExtendedUser, StrapiLoginPayload, StrapiLoginResponse, StrapiMe, StrapiRegisterPayload, StrapiRegisterResponse, StrapiResponse, StrapiUser } from '../../../interfaces/strapi';
 import { User } from '../../../interfaces/user';
 import { Router } from '@angular/router';
-
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthStrapiService extends AuthService{
   override update(extended: { data: any; }): any {
   }

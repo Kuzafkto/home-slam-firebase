@@ -39,7 +39,7 @@ export class PlayersPage implements OnInit {
   public onDeleteClicked(player:Player){
     var _player:Player = {...player};
 
-    this.players.deleteplayer(_player).subscribe(
+    this.players.deletePlayer(_player).subscribe(
         {next: player=>{
         //Notificamos con un Toast que se ha pulsado
         const options:ToastOptions = {
@@ -51,6 +51,7 @@ export class PlayersPage implements OnInit {
         };
         //creamos el toast
         this.toast.create(options).then(toast=>toast.present());
+        //this.players.getAll3().subscribe();
         },
         error: err=>{
           console.log(err);
@@ -59,11 +60,11 @@ export class PlayersPage implements OnInit {
   }
 
   public async onCardClicked(player:Player){
-    
+    console.log("oncardClicked: "+player);
     var onDismiss = (info:any)=>{
       switch(info.role){
         case 'ok':{
-          this.players.updateplayer(info).subscribe(async player=>{
+          this.players.updatePlayer(info.data).subscribe(async player=>{
               const options:ToastOptions = {
               message:"Player modified",
               duration:1000,
@@ -77,7 +78,7 @@ export class PlayersPage implements OnInit {
         }
         break;
         case 'delete':{
-          this.players.deleteplayer(info.data).subscribe(async player=>{
+          this.players.deletePlayer(info.data).subscribe(async player=>{
             const options:ToastOptions = {
             message:"Player deleted",
             duration:1000,
@@ -94,6 +95,8 @@ export class PlayersPage implements OnInit {
           console.error("No debería entrar");
         }
       }
+      this.players.getAll().subscribe();
+
     }
     this.presentForm(player, onDismiss);
   }
@@ -118,9 +121,11 @@ export class PlayersPage implements OnInit {
 
   onNewplayer(){
     var onDismiss = (info:any)=>{
+      console.log(info.data);
       switch(info.role){
         case 'ok':{
-          this.players.addplayer(info).subscribe(async player=>{
+          console.log(info.data);
+          this.players.addPlayer(info.data).subscribe(async player=>{
               const options:ToastOptions = {
               message:"Player created",
               duration:1000,

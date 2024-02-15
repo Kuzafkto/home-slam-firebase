@@ -1,8 +1,13 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, switchMap, throwError } from 'rxjs';
+import { BehaviorSubject, from, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { Player } from '../../interfaces/player';
 import { Team } from '../../interfaces/team';
+import { User } from '../../interfaces/user';
+import { FirebaseDocument, FirebaseService } from '../firebase/firebase.service';
 import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
+import { FirebaseAuthService } from './firebase/firebase-auth.service';
+import { PlayersService } from './player.service';
 import { AuthStrapiService } from './strapi/auth-strapi.service';
 AuthStrapiService
 
@@ -16,177 +21,173 @@ export class TeamService {
 
   constructor(
     private api: ApiService,
-    private auth: AuthService
+    private auth: AuthService,
+    private firebaseSvc:FirebaseService,
+    private players:PlayersService,
+    private firebaseAuth:FirebaseAuthService
   ) { }
 
-  public getteam(id: number): Observable<Team> {
-    return this.api.get(`/teams/${id}?populate=players&populate=trainers`).pipe(map(team => {
-      let players = team.data.attributes.players.data.map((player: any) => {
-        return {
-          id: player.id,
-          name: player.attributes.name
-        }
-      });
-      let trainers = team.data.attributes.trainers.data.map((trainer: any) => {
-        return {
-          id: trainer.id,
-          name: trainer.attributes.name
-        }
-      })
-      return {
-        data: {
-          id: team.data.id,
-          name: team.data.attributes.name,
-          players: players,
-          trainers: trainers
-        }
-      }
-    }))
-  }
 
-  public getAll(): Observable<Team[]> {
-    //debemos de hacer un get de todos los teamss
-    return this.auth.me().pipe(
-      switchMap(res => {
-        //de el extended user obtenemos los players que le pertenecen a ese usuario y lo meteremos dentro de un array que usaremos como filtro
-       let teams_filter = res.teams;
-
-        return this.api.get('/teams?populate=players&populate=trainers').pipe(
-          map((response: any) => {
-            let teams = response.data;
-
-            let teams_filtered: any[] = [];
-
-            let transformedTeams: Team[] = [];
-            if (teams_filter.length > 0) {
-              teams.forEach((team: any) => {
-                if (teams_filter.some((t: any) => t === team.id)) {
-                  teams_filtered.push(team);
-                }
-              });
-              
-              transformedTeams = teams_filtered.map((team: any) => {
-                let players = team.attributes.players.data.map((player: any) => {
-                  return {
-                    id: player.id,
-                    name: player.attributes.name,
-                    age: player.attributes.age
-                  };
-                });
-
-                let trainers = team.attributes.trainers.data.map((trainer: any) => {
-                  return {
-                    id: trainer.id,
-                    name: trainer.attributes.name,
-                  };
-                });
-                return {
-                  data: {
-                    id: team.id,
-                    name: team.attributes.name,
-                    players: players,
-                    trainers: trainers
-                  }
-                }
-              });
-              transformedTeams.sort((a:Team, b:Team) => b.data.id - a.data.id);
-              this._teams.next(transformedTeams);
-            }
-            return transformedTeams
-          }),
+  public getTeam(uuid: string): Observable<Team> {
+    return from(this.firebaseSvc.getDocument("teams", uuid)).pipe(
+      switchMap((doc: FirebaseDocument) => {
+        // Obtener los jugadores del equipo
+        const playerUUIDs: string[] = doc.data['players'].map((player: any) => player.uuid);
+        // Obtener todos los jugadores y filtrar los del equipo
+        return this.players.getAll().pipe(
+          map((allPlayers: Player[]) => {
+            const teamPlayers: Player[] = allPlayers.filter(player => {
+              // Verificar si uuid es undefined antes de usarlo
+              if (player.uuid !== undefined) {
+                return playerUUIDs.includes(player.uuid);
+              }
+              return false;
+            });
+            // Crear el objeto Team con los jugadores filtrados
+            const payload: Team = {
+              uuid: doc.id,
+              id: doc.data['id'],
+              name: doc.data['name'],
+              players: teamPlayers, // Asignación directa del arreglo teamPlayers
+              trainers: doc.data['trainers'].map((trainer: { uuid: any; }) => ({ uuid: trainer.uuid }))
+            };
+            return payload;
+          })
         );
-      }),
-    )
-  }
-
-  public addTeam(team: Team): Observable<Team> {
-    //ya funciona :)
-    let players = team.data.players.map((player: any) => {
-      return {
-        id: player.data.id
-      };
-    });
-    let team_mapped = {
-      data: {
-        name: team.data.name,
-        players: {
-          set: players
-        },
-        trainers: {
-          set: team.data.trainers
-        }
-      }
-    }
-    return this.api.post(`/teams/`, team_mapped).pipe(switchMap(createdTeam => {
-      let id = createdTeam.data.id;
-
-      return this.auth.me().pipe(
-        switchMap(userInfo => {
-          let extended = {
-            data: {
-              ...userInfo,
-              teams: [...userInfo.teams, id]
-            }
-          };
-          return this.auth.update(extended);
-        }),
-        map(_ => team)
-      );
-    }),);
-  }
-
-  public updateTeam(team: Team): Observable<Team> {
-    if (!team.data || !team.data.id) {
-      return throwError(() => new Error("Team data o id es undefined"))
-    }
-    let players:any[]=[];
-    if(team.data.players){
-      players = team.data.players.map((player: any) => {
-        if(player.data){
-          return{
-            id:player.data.id
-          }
-        }else{
-          return {
-            id: player.id
-          }
-        }
-       
-      });
-    }
-    let trainers:any[]=[];
-    if(team.data.trainers){
-      trainers = team.data.trainers.map((trainer: any) => {
-        return {
-          id: trainer.id
-        }
-      });
-    }
-
-    
-    let team_mapped = {
-      data: {
-        name: team.data.name,
-        players: {
-          set: players,//team.data.players
-        },
-        trainers: {
-          set: trainers//team.data.trainers
-        }
-      }
-    };
-    return this.api.put(`/teams/${team.data.id}`, team_mapped).pipe(switchMap(() => this.getteam(team.data.id))
+      })
     );
+  }
 
+
+  public getAll():Observable<Team[]>{
+    let teams:Team[]=[];
+
+    return this.firebaseAuth.me().pipe(
+      switchMap(user => {
+        // Paso 2: Traer todos los players
+        return from(this.firebaseSvc.getDocuments("teams")).pipe(
+          switchMap((documents: FirebaseDocument[]) => {
+            // Paso 3: Crear un array para los players que pertenecen al usuario
+            const userTeamsIds: string[] = user.teams || [];
+  
+            // Paso 4: Filtrar los documentos de players que pertenecen al usuario
+            const userTeams = documents.filter(doc => userTeamsIds.includes(doc.id));
+  
+            // Iterar sobre los documentos de players y mapearlos a objetos Player
+            userTeams.forEach(doc => {
+              let teamData = doc.data as Team;
+              teamData.uuid=doc.id;
+              // Supongo que los datos del player son del tipo Player
+              teams.push(teamData);
+            });
+            this._teams.next(teams);
+            // Paso 5: Hacer un next con el array resultante
+            return of(teams);
+          })
+        );
+      })
+    );
+  }
+
+  public getAll2(): Observable<Team[]> {
+    let teams: Team[] = [];
+  
+    return this.firebaseAuth.me().pipe(
+      switchMap(user => {
+        // Paso 1: Obtener todos los jugadores
+        return from(this.firebaseSvc.getDocuments("players")).pipe(
+          switchMap((playerDocuments: FirebaseDocument[]) => {
+            // Paso 2: Obtener todos los equipos
+            return from(this.firebaseSvc.getDocuments("teams")).pipe(
+              switchMap((teamDocuments: FirebaseDocument[]) => {
+                // Iterar sobre los documentos de equipos y mapearlos a objetos Team
+                teamDocuments.forEach(teamDoc => {
+                  let teamData = teamDoc.data as Team;
+                  teamData.uuid = teamDoc.id;
+                  
+                  // Inicializar el arreglo de jugadores para este equipo
+                  teamData.players = [];
+  
+                  // Iterar sobre los UUID de los jugadores asociados a este equipo
+                  teamData.players.forEach(player => {
+                    // Buscar el jugador correspondiente en el arreglo de documentos de jugadores
+                    const playerDoc = playerDocuments.find(playerdocument => playerdocument.id === player.uuid);
+                    if (playerDoc) {
+                      // Si se encuentra el jugador, agregarlo al arreglo de jugadores del equipo
+                      teamData.players.push(playerDoc.data as Player);
+                    }
+                  });
+  
+                  // Agregar el equipo al arreglo de equipos
+                  teams.push(teamData);
+                });
+  
+                // Actualizar el subject con los equipos
+                this._teams.next(teams);
+                
+                // Emitir el arreglo de equipos
+                return of(teams);
+              })
+            );
+          })
+        );
+      })
+    );
+  }
+
+  public addTeam(team: Team): Observable<any> {
+    // Verificar si team.players es definido y no nulo antes de mapearlo
+    let players = team.players ? team.players.map(player => ({ id: player.id, uuid: player.uuid })) : [];
+    
+    let payload = {
+      ...team,
+      players: players
+    };
+    
+    return from(this.firebaseSvc.createDocument("teams", payload)).pipe(
+      switchMap((created: any) => {
+        const docId = created;
+        return this.firebaseAuth.me().pipe(
+          switchMap((user: User) => {
+            if (user && user.uuid) {
+              return from(this.firebaseSvc.updateDocumentField("users", user.uuid, "teams", user.teams.concat(docId))).pipe(
+                map(() => payload)
+              );
+            } else {
+              return new Observable<Team>(obs => {
+                obs.error(new Error('User does not have UUID'));
+              });
+            }
+          })
+        );
+      })
+    );
+    }
+  public updateTeam(team: Team): Observable<any> {
+    return new Observable<Team>(obs=>{
+
+      if(team.uuid){
+    this.firebaseSvc.updateDocument("teams",team,team.uuid);
+      obs.next(team);
+      }
+    else{
+    obs.error(new Error("Team does not have UUID"));
+    }
+    });
   }
 
   public deleteTeam(team: Team): Observable<Team> {
-    return new Observable<Team>(obs => {
-      this.api.delete(`/teams/${team.data.id}`).subscribe(_ => {
-        this.getAll().subscribe(_ => {
+    return new Observable<Team>(obs=>{
+      if(team.uuid){
+      from (this.firebaseSvc.deleteDocument("teams",team.uuid)).subscribe(_=>{
+        this.getAll().subscribe(_=>{
           obs.next(team);
         })
-      })
+      });
+      }
+  else{
+      obs.error(new Error("Team does not have UUID"));
+  }
     });
   }
 }

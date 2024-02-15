@@ -33,17 +33,17 @@ export class TeamDetailComponent implements OnInit {
   @Input() set team(_team: Team | null) {
     if (_team) {
       this.mode = 'Edit';
-      this.form.controls['id'].setValue(_team.data.id);
-      this.form.controls['name'].setValue(_team.data.name);
+      this.form.controls['id'].setValue(_team.id);
+      this.form.controls['name'].setValue(_team.name);
 
       this.currentTeamPlayers.clear(); //hay que vaciarlo
       //this.selectedTrainers.clear();
 
-      _team.data.players.forEach(
+      _team.players.forEach(
         player => {
           //objeto de tipo player a base del get 
           //primero nos suscribimos y a la suscripcion haccemos el add
-          this.playerSvc.getplayer(player.id).subscribe((playerData: Player) => {
+          this.playerSvc.getPlayer("player.id").subscribe((playerData: Player) => {
             this.currentTeamPlayers.add(playerData);
             this.initialPlayers.add(playerData);
           });
@@ -67,7 +67,7 @@ export class TeamDetailComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.playerSvc.getAll().subscribe(
+    /*this.playerSvc.getAll().subscribe(
       (players: any[]) => {
         let initialPlayersArray = Array.from(this.initialPlayers);
         players.forEach(player => {
@@ -78,7 +78,7 @@ export class TeamDetailComponent implements OnInit {
           }
         });
       }
-    );
+    );*/
     this.name = this.form.get('name')?.value;
   }
 
@@ -128,13 +128,13 @@ export class TeamDetailComponent implements OnInit {
       );
 
       if (event.previousContainer.id === 'availablePlayersList') {
-        this.playerSvc.getplayer(playerId).subscribe((player: Player) => {
+        this.playerSvc.getPlayer("playerId").subscribe((player: Player) => {
           this.currentTeamPlayers.add(player);
           this.removePlayer(player, this.availablePlayers);
           this.addToFormArray(player);
         });
       } else {
-        this.playerSvc.getplayer(playerId).subscribe((player: Player) => {
+        this.playerSvc.getPlayer("playerId").subscribe((player: Player) => {
           this.removePlayer(player, this.currentTeamPlayers);
           this.availablePlayers.add(player);
           this.removeFromFormArray(playerId);

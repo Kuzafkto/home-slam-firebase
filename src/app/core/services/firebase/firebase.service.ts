@@ -206,12 +206,13 @@ export class FirebaseService {
     });
   }
 
-  public subscribeToCollection(collectionName: string, subject: BehaviorSubject<any[]>, mapFunction: (el: DocumentData) => any): Unsubscribe | null {
-    if (!this._db)
-      return null;
+  public subscribeToCollection(collectionName:string, subject: BehaviorSubject<any[]>, mapFunction:(el:FirebaseDocument)=>any):Unsubscribe | null{
+    if(!this._db)
+        return null;
     return onSnapshot(collection(this._db, collectionName), (snapshot) => {
-      subject.next(snapshot.docs.map<any>(doc => mapFunction(doc)));
-    }, error => { });
+      subject.next(snapshot.docs.map<FirebaseDocument>(doc=>{
+        return {id:doc.id, data:doc.data()}}).map(mapFunction));
+    }, error=>{});
   }
 
   public signOut(signInAnon: boolean = false): Promise<void> {

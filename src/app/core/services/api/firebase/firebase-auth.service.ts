@@ -4,7 +4,11 @@ import { UserRegisterInfo } from '../../../interfaces/user-register-info';
 import { User } from '../../../interfaces/user';
 import { AuthService } from '../auth.service';
 import { FirebaseService, FirebaseUserCredential } from '../../firebase/firebase.service';
+import { Injectable } from '@angular/core';
 
+@Injectable({
+  providedIn: 'root'
+})
 export class FirebaseAuthService extends AuthService{
 
   constructor(
@@ -55,7 +59,11 @@ export class FirebaseAuthService extends AuthService{
         if(!credentials || !credentials.user || !credentials.user.user || !credentials.user.user.uid)
           subscr.error('Cannot register');
         if(credentials){
-          var _info:User = {...info};
+          var _info:User = {
+            ...info,
+            players: [],
+            teams: []
+          };
           _info.uuid = this.firebaseSvc.user?.uid;
           this.postRegister(_info).subscribe(data=>{
             this._user.next(_info);
@@ -74,7 +82,7 @@ export class FirebaseAuthService extends AuthService{
     name:info.name,
     surname:info.surname,
     nickname:info.nickname,
-    piture:info.picture??""
+    picture:info.picture??""
     }, info.uuid))
     throw new Error('Error inesperado');
   }
@@ -86,6 +94,8 @@ export class FirebaseAuthService extends AuthService{
           name:data.data['name'],
           surname:data.data['surname'],
           nickname:data.data['nickname'],
+          players:data.data['players'],
+          teams:data.data['teams'],
           picture:data.data['picture']??"",
           uuid:data.id
         }

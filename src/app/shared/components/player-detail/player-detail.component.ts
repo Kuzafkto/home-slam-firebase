@@ -19,6 +19,7 @@ export class PlayerDetailComponent implements OnInit {
   name: string = "";
   surname: string = "";
   age: number = 18;
+  uuid:string="";
   @Input() set player(_player: Player | null) {
     if (_player) {
       this.mode = 'Edit';
@@ -26,11 +27,13 @@ export class PlayerDetailComponent implements OnInit {
       this.form.controls['name'].setValue(_player.name);
       this.form.controls['surname'].setValue(_player.surname);
       this.form.controls['age'].setValue(_player.age);
-
+      if(_player.uuid){
+        this.uuid=_player.uuid;
+      }
       this.selectedPositions.clear();
       _player.positions.forEach(position => {
-        this.selectedPositions.add(position.id);
-        (this.form.get('positions') as FormArray).push(new FormControl(position.id));
+        this.selectedPositions.add(position);
+        (this.form.get('positions') as FormArray).push(new FormControl(position));
       });
       this.initialSelectedPositions = new Set(this.selectedPositions);
     }
@@ -97,7 +100,10 @@ export class PlayerDetailComponent implements OnInit {
   }
 
   onSubmit() {
-    this._modal.dismiss(this.form.value, 'ok');
+     // Agregar el uuid al objeto del formulario antes de descartarlo
+     const formWithUUID = { ...this.form.value, uuid: this.uuid };
+     console.log(formWithUUID);
+     this._modal.dismiss(formWithUUID, 'ok');
   }
 
   onDelete() {
@@ -116,7 +122,6 @@ export class PlayerDetailComponent implements OnInit {
 
   //chequea si el formulario esta sucio, es necesario esta funcion porque el .dirty por defecto no tiene en cuenta los formArray por lo que chequearemos si los sets de las posiciones iniciales y las "cambiadas" son los mismos
   get isFormDirty(): boolean {
-    console.log(this.form.get('name')?.value);
     return (this.form.get('name')?.value != this.name || this.form.get('surname')?.value != this.surname || this.form.get('age')?.value != this.age) || !this.areSetsEqual(this.selectedPositions, this.initialSelectedPositions);
   }
 

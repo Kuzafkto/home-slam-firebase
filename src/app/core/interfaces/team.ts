@@ -1,18 +1,11 @@
-export interface Team{
-    data:{
-        id:number,
-        name:string,
-        players:[
-            {
-                id:number,
-                name:string
-            }
-        ],
-        trainers:[
-            {
-                id:number,
-                name:string
-            }
-        ]
-    }
-}
+import { Player } from "./player";
+import { Trainer } from "./trainer";
+
+export interface Team {
+    id: number;
+    name: string;
+    players: Player[],
+    trainers: Trainer[],
+    uuid?: string;
+  }
+  

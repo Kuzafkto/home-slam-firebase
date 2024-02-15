@@ -25,15 +25,12 @@ export class UsersService {
   public users$: Observable<PaginatedUsers> = this._users.asObservable();
 
   public addUser(user: User): Observable<any> {
-    if (user.uuid) {
-      return from(this.firebaseSvc.createDocumentWithId("users", {
+      return from(this.firebaseSvc.createDocument("users", {
         name: user.name,
         surname: user.surname,
         nickname: user.nickname
-      }, user.uuid));//funciona pero como genero un uuid automatico?
-    } else {
-      throw new Error("User does not have uuid")
-    }
+      }));
+    
   }
 
 

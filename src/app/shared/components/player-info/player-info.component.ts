@@ -22,7 +22,7 @@ export class PlayerInfoComponent implements OnInit {
     });
   }
 
-  ur2: Position[] | undefined = this.player?.positions;
+  ur2: number[] | undefined = this.player?.positions;
   onCardClick() {
     this.onCardClicked.emit();
   }

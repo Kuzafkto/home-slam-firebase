@@ -23,21 +23,21 @@ export class PositionSelectorComponent implements ControlValueAccessor {
   setChecker: Set<number> = this.inputPositions;
   onChangeCb?: (position: Position) => void;
   onTouchedCb?: () => void;
-  allPositions: Position[] = [
-    { id: 1, name: 'pitcher' },
-    { id: 2, name: 'catcher' },
-    { id: 3, name: 'firstBase' },
-    { id: 4, name: 'secondBase' },
-    { id: 5, name: 'thirdBase' },
-    { id: 6, name: 'shortstop' },
-    { id: 7, name: 'leftField' },
-    { id: 8, name: 'centerField' },
-    { id: 9, name: 'rightField' },
+  allPositions= [
+    { id: 1, name: 'Pitcher' },
+    { id: 2, name: 'Catcher' },
+    { id: 3, name: 'First Base' },
+    { id: 4, name: 'Second Base' },
+    { id: 5, name: 'Third Base' },
+    { id: 6, name: 'Shortstop' },
+    { id: 7, name: 'Left Field' },
+    { id: 8, name: 'Center Field' },
+    { id: 9, name: 'Right Field' },
   ];
   constructor() { }
 
 
-  addPosition(position: Position): void {
+  addPosition(position: any): void {
     this.setChecker.clear();
     const index = this.positionsSelected.indexOf(position.id);
     if (index > -1) {

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Player } from 'src/app/core/interfaces/player';
 import { Team } from 'src/app/core/interfaces/team';
 
 @Component({
@@ -11,7 +12,7 @@ export class TeamInfoComponent  implements OnInit {
   @Input() team:Team | null=null;
   @Output() onCardClicked:EventEmitter<void> = new EventEmitter<void>();
   @Output() onDeleteClicked:EventEmitter<void> = new EventEmitter<void>();
-  
+  @Input() players:Player[]|null=null;
 
   constructor() { }
 

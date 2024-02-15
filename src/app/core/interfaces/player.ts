@@ -5,7 +5,7 @@ export interface Player {
     name: string,
     surname: string,
     age: number,
-    positions: Position[],
+    positions: number[],
     uuid?: string
 }
 export interface Position {

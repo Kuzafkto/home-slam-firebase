@@ -39,11 +39,7 @@
           <div class="player-positions-row">
             <ng-container *ngFor="let position of player?.positions">
               <!-- Usas aca positionImage -->
-              <div
-                class="position-image"
-                positionImage
-                positionName="{{ position.name }}"
-              ></div>
+              <div class="position-image" positionImage [positionName]="position"></div>
             </ng-container>
           </div>
         </div>
