@@ -82,6 +82,8 @@ export class FirebaseAuthService extends AuthService{
     name:info.name,
     surname:info.surname,
     nickname:info.nickname,
+    players:[],
+    teams:[],
     picture:info.picture??""
     }, info.uuid))
     throw new Error('Error inesperado');

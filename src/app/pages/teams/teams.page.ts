@@ -22,7 +22,7 @@ export class TeamsPage implements OnInit {
 
   ngOnInit() {
     this.loading = true;
-    this.teams.getAll().subscribe(results=>{
+    this.teams.getAll2().subscribe(results=>{
       this.loading = false;
     });
   }
@@ -32,7 +32,7 @@ export class TeamsPage implements OnInit {
     var onDismiss = (info:any)=>{
       switch(info.role){
         case 'ok':{
-          this.teams.addTeam(info).subscribe(async player=>{
+          this.teams.addTeam(info.data).subscribe(async player=>{
               const options:ToastOptions = {
               message:"Team created",
               duration:1000,
@@ -42,7 +42,7 @@ export class TeamsPage implements OnInit {
             };
             const toast = await this.toast.create(options);
             toast.present();
-            this.teams.getAll().subscribe();
+            this.teams.getAll2().subscribe();
           })
         }
         break;
@@ -59,7 +59,7 @@ export class TeamsPage implements OnInit {
     var onDismiss = (info:any)=>{
       switch(info.role){
         case 'ok':{
-          this.teams.updateTeam(info).subscribe(async team=>{
+          this.teams.updateTeam(info.data).subscribe(async team=>{
               const options:ToastOptions = {
               message:"Team modified",
               duration:1000,
@@ -69,7 +69,7 @@ export class TeamsPage implements OnInit {
             };
             const toast = await this.toast.create(options);
             toast.present();
-            this.teams.getAll().subscribe();
+            this.teams.getAll2().subscribe();
           })
         }
         break;
@@ -84,7 +84,7 @@ export class TeamsPage implements OnInit {
           };
           const toast = await this.toast.create(options);
           toast.present();
-          this.teams.getAll().subscribe();
+          this.teams.getAll2().subscribe();
         })
         }
         break;
@@ -92,6 +92,7 @@ export class TeamsPage implements OnInit {
           console.error("No debería entrar");
         }
       }
+      this.teams.getAll2().subscribe();
     }
     this.presentForm(team, onDismiss);
   }
@@ -120,7 +121,7 @@ export class TeamsPage implements OnInit {
       });
   }
 
-  async presentForm(data:Team|null, onDismiss:(result:any)=>void){
+  async presentForm(data:any|null, onDismiss:(result:any)=>void){
     
     const modal = await this.modal.create({
       component:TeamDetailComponent,

@@ -126,20 +126,49 @@ public updatePlayer(player:Player):Observable<Player>{
   });
 }
 
-public deletePlayer(player:Player):Observable<Player>{
-  return new Observable<Player>(obs=>{
-    if(player.uuid){
-    from (this.firebaseSvc.deleteDocument("players",player.uuid)).subscribe(_=>{
-      this.getAll().subscribe(_=>{
-        obs.next(player);
-      })
-    });
+public deletePlayer(player: Player): Observable<Player> {
+  return new Observable<Player>(obs => {
+    if (!player.uuid) {
+      obs.error(new Error("Player does not have UUID"));
+      return;
     }
-else{
-    obs.error(new Error("Player does not have UUID"));
-}
+
+    // Eliminar el jugador de la colección "players"
+    from(this.firebaseSvc.deleteDocument("players", player.uuid)).pipe(
+      switchMap(() => {
+        // Obtener el usuario actual
+        return this.firebaseAuth.me();
+      }),
+      switchMap((user: User) => {
+        // Verificar que el usuario tenga UUID y una lista de jugadores
+        if (!user || !user.uuid || !user.players || user.players.length === 0) {
+          return new Observable<Player>(obs => {
+            obs.error(new Error('User is incomplete'));
+          });
+        }
+
+        // Eliminar el UUID del jugador del array de jugadores del usuario
+        user.players = user.players.filter(uuid => uuid !== player.uuid);
+
+        // Actualizar el documento del usuario
+        return from(this.firebaseSvc.updateDocument("users", user, user.uuid));
+      })
+    ).subscribe({
+      next: () => {
+        // Eliminar el jugador del array de jugadores locales
+        this._players.next(this._players.getValue().filter(p => p.uuid !== player.uuid));
+        obs.next(player); // Devolver el jugador eliminado en el observable
+        obs.complete();
+      },
+      error: error => {
+        obs.error(error); // Propagar cualquier error que ocurra durante el proceso
+      }
+    });
   });
 }
+
+
+
 
 
   public deleteAll(): Observable<void> {

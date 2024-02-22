@@ -16,8 +16,8 @@ AuthStrapiService
 })
 export class TeamService {
 
-  private _teams: BehaviorSubject<Team[]> = new BehaviorSubject<Team[]>([]);
-  public teams$: Observable<Team[]> = this._teams.asObservable();
+  private _teams: BehaviorSubject<any[]> = new BehaviorSubject<Team[]>([]);
+  public teams$: Observable<any[]> = this._teams.asObservable();
 
   constructor(
     private api: ApiService,
@@ -87,6 +87,7 @@ export class TeamService {
         );
       })
     );
+
   }
 
   public getAll2(): Observable<Team[]> {
@@ -101,23 +102,41 @@ export class TeamService {
             return from(this.firebaseSvc.getDocuments("teams")).pipe(
               switchMap((teamDocuments: FirebaseDocument[]) => {
                 // Iterar sobre los documentos de equipos y mapearlos a objetos Team
-                teamDocuments.forEach(teamDoc => {
+                const userTeamsIds: string[] = user.teams || [];
+  
+                // Paso 4: Filtrar los documentos de players que pertenecen al usuario
+                const userTeams = teamDocuments.filter(doc => userTeamsIds.includes(doc.id));
+                userTeams.forEach(teamDoc => {
                   let teamData = teamDoc.data as Team;
                   teamData.uuid = teamDoc.id;
                   
                   // Inicializar el arreglo de jugadores para este equipo
-                  teamData.players = [];
-  
+                  let playersFiltered: Player[]=[];
+                  
                   // Iterar sobre los UUID de los jugadores asociados a este equipo
-                  teamData.players.forEach(player => {
-                    // Buscar el jugador correspondiente en el arreglo de documentos de jugadores
-                    const playerDoc = playerDocuments.find(playerdocument => playerdocument.id === player.uuid);
-                    if (playerDoc) {
-                      // Si se encuentra el jugador, agregarlo al arreglo de jugadores del equipo
-                      teamData.players.push(playerDoc.data as Player);
+                  teamData.players.forEach(playerUUID => {
+                    // Verificar que playerUUID sea una cadena
+                    if (typeof playerUUID === 'string') {
+                        // Buscar el jugador correspondiente en el arreglo de documentos de jugadores
+                        const playerDoc = playerDocuments.find(playerDocument => playerDocument.id === playerUUID);
+                        if (playerDoc) {
+                            // Obtener los datos del jugador del documento
+                            const playerDataFromDocument = playerDoc.data as Player;
+                            // Crear un nuevo objeto Player con los datos del documento y el UUID
+                            const playerData: Player = {
+                                ...playerDataFromDocument,
+                                uuid: playerUUID
+                            };
+                            // Agregar el jugador al arreglo de jugadores del equipo
+                            playersFiltered.push(playerData);
+                        }
                     }
-                  });
-  
+                });
+                
+                
+                
+                
+                  teamData.players=playersFiltered;
                   // Agregar el equipo al arreglo de equipos
                   teams.push(teamData);
                 });
@@ -135,23 +154,21 @@ export class TeamService {
     );
   }
 
-  public addTeam(team: Team): Observable<any> {
-    // Verificar si team.players es definido y no nulo antes de mapearlo
-    let players = team.players ? team.players.map(player => ({ id: player.id, uuid: player.uuid })) : [];
-    
-    let payload = {
-      ...team,
-      players: players
-    };
-    
-    return from(this.firebaseSvc.createDocument("teams", payload)).pipe(
-      switchMap((created: any) => {
-        const docId = created;
+
+  
+  public addTeam(team: Team): Observable<Team> {
+    return from(this.firebaseSvc.createDocument("teams", team)).pipe(
+      switchMap((createdDocId: string) => {
+        // Obtener el usuario actual
         return this.firebaseAuth.me().pipe(
           switchMap((user: User) => {
             if (user && user.uuid) {
-              return from(this.firebaseSvc.updateDocumentField("users", user.uuid, "teams", user.teams.concat(docId))).pipe(
-                map(() => payload)
+              // Agregar el UUID del equipo al array de equipos del usuario
+              user.teams.push(createdDocId);
+  
+              // Actualizar el documento del usuario con el nuevo array de equipos
+              return from(this.firebaseSvc.updateDocumentField("users", user.uuid, "teams", user.teams)).pipe(
+                map(() => team) // Devolver el equipo creado después de la actualización
               );
             } else {
               return new Observable<Team>(obs => {
@@ -162,32 +179,80 @@ export class TeamService {
         );
       })
     );
-    }
-  public updateTeam(team: Team): Observable<any> {
-    return new Observable<Team>(obs=>{
-
-      if(team.uuid){
-    this.firebaseSvc.updateDocument("teams",team,team.uuid);
-      obs.next(team);
+  }
+  
+  
+  
+  
+  public updateTeam(team: Team): Observable<string[]> {
+    return new Observable<string[]>(obs => {
+      if (team.uuid) {
+        // Inicializar un array para almacenar los UUID de los jugadores
+        const playerUUIDs: string[] = [];
+        
+        // Recorrer los jugadores y agregar sus UUID al array
+        team.players.forEach(player => {
+          if (player.uuid) {
+            playerUUIDs.push(player.uuid);
+          }
+        });
+  
+        // Actualizar el campo 'players' con el nuevo array de UUID
+        from(this.firebaseSvc.updateDocumentField("teams", team.uuid, "players", playerUUIDs))
+          .subscribe({
+            next: _ => {
+              obs.next(playerUUIDs); // Devolver el array de UUID
+            },
+            error: error => {
+              obs.error(error);
+            }
+          });
+      } else {
+        obs.error(new Error("Team does not have UUID"));
       }
-    else{
-    obs.error(new Error("Team does not have UUID"));
-    }
     });
   }
+  
+  
+  
 
   public deleteTeam(team: Team): Observable<Team> {
-    return new Observable<Team>(obs=>{
-      if(team.uuid){
-      from (this.firebaseSvc.deleteDocument("teams",team.uuid)).subscribe(_=>{
-        this.getAll().subscribe(_=>{
-          obs.next(team);
-        })
-      });
+    return new Observable<Team>(obs => {
+      if (!team.uuid) {
+        obs.error(new Error("Team does not have UUID"));
+        return;
       }
-  else{
-      obs.error(new Error("Team does not have UUID"));
-  }
+  
+      // Eliminar el equipo de la colección "teams"
+      from(this.firebaseSvc.deleteDocument("teams", team.uuid)).pipe(
+        switchMap(() => {
+          // Obtener el usuario actual
+          return this.firebaseAuth.me();
+        }),
+        switchMap((user: User) => {
+          // Verificar que el usuario tenga UUID y una lista de equipos
+          if (!user || !user.uuid || !user.teams || user.teams.length === 0) {
+            return new Observable<Team>(obs => {
+              obs.error(new Error('User is incomplete'));
+            });
+          }
+  
+          // Eliminar el UUID del equipo del array de equipos del usuario
+          user.teams = user.teams.filter(uuid => uuid !== team.uuid);
+  
+          // Actualizar el documento del usuario
+          return from(this.firebaseSvc.updateDocument("users", user, user.uuid));
+        })
+      ).subscribe({
+        next: () => {
+          obs.next(team); // Devolver el equipo eliminado en el observable
+          obs.complete();
+        },
+        error: error => {
+          obs.error(error); // Propagar cualquier error que ocurra durante el proceso
+        }
+      });
     });
   }
+  
 }

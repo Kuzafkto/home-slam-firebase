@@ -35,7 +35,7 @@ export class TeamDetailComponent implements OnInit {
       this.mode = 'Edit';
       this.form.controls['id'].setValue(_team.id);
       this.form.controls['name'].setValue(_team.name);
-
+      this.form.controls['uuid'].setValue(_team.uuid); 
       this.currentTeamPlayers.clear(); //hay que vaciarlo
       //this.selectedTrainers.clear();
 
@@ -43,7 +43,8 @@ export class TeamDetailComponent implements OnInit {
         player => {
           //objeto de tipo player a base del get 
           //primero nos suscribimos y a la suscripcion haccemos el add
-          this.playerSvc.getPlayer("player.id").subscribe((playerData: Player) => {
+          if(player.uuid)
+          this.playerSvc.getPlayer(player.uuid).subscribe((playerData: Player) => {
             this.currentTeamPlayers.add(playerData);
             this.initialPlayers.add(playerData);
           });
@@ -62,23 +63,25 @@ export class TeamDetailComponent implements OnInit {
       id: [null],
       name: ['', [Validators.required]],
       players: this.formBuilder.array([]),
+      uuid: ['']
       //trainers: this.formBuilder.array([])
     })
   }
 
   ngOnInit() {
-    /*this.playerSvc.getAll().subscribe(
+    
+    this.playerSvc.getAll().subscribe(
       (players: any[]) => {
         let initialPlayersArray = Array.from(this.initialPlayers);
         players.forEach(player => {
-          if (initialPlayersArray.some((p: Player) => p.id === player.data.id)) {
+          if (initialPlayersArray.some((p: Player) => p.uuid === player.uuid)) {
             this.removePlayer(player, this.availablePlayers);
           } else {
             this.availablePlayers.add(player);
           }
         });
       }
-    );*/
+    );
     this.name = this.form.get('name')?.value;
   }
 
@@ -115,7 +118,7 @@ export class TeamDetailComponent implements OnInit {
       }
     }
   }*/
-  drop(event: CdkDragDrop<number[]>) {
+  drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
@@ -128,13 +131,13 @@ export class TeamDetailComponent implements OnInit {
       );
 
       if (event.previousContainer.id === 'availablePlayersList') {
-        this.playerSvc.getPlayer("playerId").subscribe((player: Player) => {
+        this.playerSvc.getPlayer(playerId).subscribe((player: Player) => {
           this.currentTeamPlayers.add(player);
           this.removePlayer(player, this.availablePlayers);
           this.addToFormArray(player);
         });
       } else {
-        this.playerSvc.getPlayer("playerId").subscribe((player: Player) => {
+        this.playerSvc.getPlayer(playerId).subscribe((player: Player) => {
           this.removePlayer(player, this.currentTeamPlayers);
           this.availablePlayers.add(player);
           this.removeFromFormArray(playerId);
@@ -145,21 +148,22 @@ export class TeamDetailComponent implements OnInit {
     }
   }
   private removePlayer(player: Player, set: Set<Player>) {
-    const playerIdToRemove = player.id; // El ID del jugador a eliminar
+    const playerIdToRemove = player.uuid; // El ID del jugador a eliminar
 
     // Encuentra el objeto Player específico en el conjunto que coincida con el ID
-    const playerToRemove = Array.from(set).find(player => player.id === playerIdToRemove);
+    const playerToRemove = Array.from(set).find(player => player.uuid === playerIdToRemove);
 
     if (playerToRemove) {
       set.delete(playerToRemove);
     }
   }
   //control del form 
-  private removeFromFormArray(playerId: number) {
+  private removeFromFormArray(playerId: string) {
     const playersArray = this.form.get('players') as FormArray;
-    const index = playersArray.controls.findIndex((player: any) => player.value.id === playerId);
+    const index = playersArray.controls.findIndex((player: any) => player.value.uuid === playerId);
     if (index !== -1) {
       playersArray.removeAt(index);
+      console.log(playersArray);
     }
   }
 
@@ -172,24 +176,25 @@ export class TeamDetailComponent implements OnInit {
 
   //funciones get que convierten el set en arrays con los id para poder hacer el ngFor
 
-  get availablePlayersArray(): number[] {
+  get availablePlayersArray(): string[] {
     let availableAsArray = Array.from(this.availablePlayers);
-    let availablePlayersId: number[] = [];
+    let availablePlayersId: string[] = [];
 
     availableAsArray.forEach(player => {
-      if (player.id)
-        availablePlayersId.push(player.id);
+      if (player.uuid)
+        availablePlayersId.push(player.uuid);
     });
 
     return availablePlayersId;
   }
 
-  get currentTeamPlayersArray(): number[] {
+  get currentTeamPlayersArray(): string[] {
     let currentTeamAsArray = Array.from(this.currentTeamPlayers);
-    let currentTeamId: number[] = [];
+    let currentTeamId: string[] = [];
 
     currentTeamAsArray.forEach(player => {
-      currentTeamId.push(player.id);
+      if(player.uuid)
+      currentTeamId.push(player.uuid);
     });
 
     return currentTeamId;

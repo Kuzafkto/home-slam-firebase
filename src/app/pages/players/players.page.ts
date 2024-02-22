@@ -29,10 +29,6 @@ export class PlayersPage implements OnInit {
     });
   }
 
-  public welcome(){
-    this.router.navigate(['/welcome']);
-  }
-
 
   
 

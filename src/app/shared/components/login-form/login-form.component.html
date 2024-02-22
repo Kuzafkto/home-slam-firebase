@@ -9,7 +9,7 @@
   </ion-item>
   <div class="ion-text-end">
     <div class="center-button">
-      <ion-button [disabled]="!form.valid" (click)="onSubmit()">{{'login.submit'|translate}}</ion-button>
+      <button type="submit" [disabled]="!form.valid" (click)="onSubmit()">{{'login.submit'|translate}}</button>
     </div>
   </div>
   <div *ngIf="form.get('password')?.invalid && form.get('password')?.touched" class="error-message">

@@ -35,38 +35,6 @@ export class HomePage implements OnInit {
   }
   userUrl = ""
   ngOnInit(): void {
-    let user: User = {
-      name: 'finalTest??',
-      surname: 'asdasdasdasd',
-      nickname: 'joe',
-      players: [],
-      teams: []
-    }
-
-    this.players.getAll().pipe(
-      tap((players: Player[]) => {
-        players.forEach(player => {
-          console.log("Player Name:", player.name);
-          console.log("Player Age:", player.age);
-          console.log("Player Positions:", player.positions);
-          console.log(player.uuid); 
-          // Puedes agregar más propiedades según tus necesidades
-        });
-      })
-    ).subscribe();
-    this.teams.getAll2().pipe(tap((teams:Team[])=>{
-      teams.forEach(team=>{
-        console.log("Team: "+team.name);
-      })
-    })).subscribe();
-    /*this.players.getPlayer2("1761f5wUYGCcAI6sxZVf").pipe(tap((player:Player)=>{
-      console.log("getPlayerResult: "+player.positions);
-    })).subscribe();
-    //this.players.getAll2();
-    this.players.updatePlayer2(changed).pipe(tap((player:Player)=>{
-      console.log("updatePlayerResults: "+player.name);
-    })).subscribe();*/
-    //this.players.deletePlayer2(changed).subscribe();
     this.loading = true;
     this.http.get("https://api.github.com/search/users?q=Kuzafkto+in%3Ausername", null, null).subscribe((result: any) => {
       this.userUrl = result.items[0].avatar_url;
