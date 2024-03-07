@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Unsubscribe } from 'firebase/firestore';
 import { BehaviorSubject, from, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { Player } from '../../interfaces/player';
 import { Team } from '../../interfaces/team';
@@ -18,6 +19,7 @@ export class TeamService {
 
   private _teams: BehaviorSubject<any[]> = new BehaviorSubject<Team[]>([]);
   public teams$: Observable<any[]> = this._teams.asObservable();
+  private unsubscribe:Unsubscribe|null = null;
 
   constructor(
     private api: ApiService,
@@ -25,7 +27,9 @@ export class TeamService {
     private firebaseSvc:FirebaseService,
     private players:PlayersService,
     private firebaseAuth:FirebaseAuthService
-  ) { }
+  ) {
+    this.teams$=this.firebaseSvc.teams$;
+   }
 
 
   public getTeam(uuid: string): Observable<Team> {
@@ -59,38 +63,7 @@ export class TeamService {
   }
 
 
-  public getAll():Observable<Team[]>{
-    let teams:Team[]=[];
-
-    return this.firebaseAuth.me().pipe(
-      switchMap(user => {
-        // Paso 2: Traer todos los players
-        return from(this.firebaseSvc.getDocuments("teams")).pipe(
-          switchMap((documents: FirebaseDocument[]) => {
-            // Paso 3: Crear un array para los players que pertenecen al usuario
-            const userTeamsIds: string[] = user.teams || [];
-  
-            // Paso 4: Filtrar los documentos de players que pertenecen al usuario
-            const userTeams = documents.filter(doc => userTeamsIds.includes(doc.id));
-  
-            // Iterar sobre los documentos de players y mapearlos a objetos Player
-            userTeams.forEach(doc => {
-              let teamData = doc.data as Team;
-              teamData.uuid=doc.id;
-              // Supongo que los datos del player son del tipo Player
-              teams.push(teamData);
-            });
-            this._teams.next(teams);
-            // Paso 5: Hacer un next con el array resultante
-            return of(teams);
-          })
-        );
-      })
-    );
-
-  }
-
-  public getAll2(): Observable<Team[]> {
+  public getAll(): Observable<Team[]> {
     let teams: Team[] = [];
   
     return this.firebaseAuth.me().pipe(
@@ -165,7 +138,6 @@ export class TeamService {
             if (user && user.uuid) {
               // Agregar el UUID del equipo al array de equipos del usuario
               user.teams.push(createdDocId);
-  
               // Actualizar el documento del usuario con el nuevo array de equipos
               return from(this.firebaseSvc.updateDocumentField("users", user.uuid, "teams", user.teams)).pipe(
                 map(() => team) // Devolver el equipo creado después de la actualización
@@ -196,7 +168,7 @@ export class TeamService {
             playerUUIDs.push(player.uuid);
           }
         });
-  
+        
         // Actualizar el campo 'players' con el nuevo array de UUID
         from(this.firebaseSvc.updateDocumentField("teams", team.uuid, "players", playerUUIDs))
           .subscribe({
@@ -210,6 +182,10 @@ export class TeamService {
       } else {
         obs.error(new Error("Team does not have UUID"));
       }
+      if(team.uuid)
+      this.firebaseSvc.updateDocumentField("teams",team.uuid,"name",team.name)
+      else
+        obs.error(new Error("Team does not have UUID"));
     });
   }
   

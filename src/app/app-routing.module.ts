@@ -10,7 +10,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'splash',
     pathMatch: 'full'
   },
   {
@@ -23,16 +23,23 @@ const routes: Routes = [
   },
   {
     path: 'players',
-    loadChildren: () => import('./pages/players/players.module').then( m => m.PlayersPageModule)
+    loadChildren: () => import('./pages/players/players.module').then( m => m.PlayersPageModule),
+    canActivate:[AuthGuard]
   },
   {
     path: 'teams',
-    loadChildren: () => import('./pages/teams/teams.module').then( m => m.TeamsPageModule)
+    loadChildren: () => import('./pages/teams/teams.module').then( m => m.TeamsPageModule),
+    canActivate:[AuthGuard]
   },
   {
     path: 'about',
     loadChildren: () => import('./pages/about/about.module').then( m => m.AboutPageModule)
+  },
+  {
+    path: 'splash',
+    loadChildren: () => import('./pages/splash/splash.module').then( m => m.SplashPageModule)
   }
+
 
 ];
 

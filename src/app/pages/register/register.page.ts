@@ -27,6 +27,7 @@ export class RegisterPage implements OnInit {
         console.log(err);
       }
     });
+    this.router.navigate(['home']);
   }
 
   goToLoginPage() {

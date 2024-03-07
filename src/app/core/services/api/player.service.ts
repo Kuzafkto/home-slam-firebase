@@ -27,12 +27,27 @@ export class PlayersService {
     private firebaseAuth:FirebaseAuthService
   ) {
     //falta el mappingfunction (esperar al profe, mientras NO crear el getAll)
-    //this.firebaseSvc.subscribeToCollection("players",this._players);
-    //this.unsubscribe = this.firebaseSvc.subscribeToCollection('players', this._players, this.mapPlayers);
+    //this.firebaseSvc.subscribeToCollection("players",this._players,this.mapPlayers);
+    this.mapPlayers = this.mapPlayers.bind(this);
+    this.players$=this.firebaseSvc.players$;
   }
 
   // Este no tiene mapeos internos, simplemente datos
-  mapPlayers(doc:FirebaseDocument):Player{
+  mapPlayers(doc: FirebaseDocument): Player {
+    
+    // Imprime el UID del usuario actual
+    console.log(this.firebaseSvc.user?.uid);
+    this.firebaseAuth.user$.subscribe(user => {
+      console.log(user);
+    }); 
+    
+    this.firebaseAuth.me().subscribe(user => {
+      if(user.players.includes(doc.id)){
+        console.log("incluye "+doc.data['name']);
+      }
+    });
+  
+    // Luego puedes proceder con el mapeo de doc a Player
     return {
       id: doc.data['id'],
       name: doc.data['name'],
@@ -40,8 +55,29 @@ export class PlayersService {
       age: doc.data['age'],
       positions: doc.data['positions'],
       uuid: doc.id
+    };
+  }
+  
+
+  mapPlayers2(doc: FirebaseDocument): Player | null {
+    let userUid = this.firebaseSvc.user?.uid; // Obtener el UUID del usuario logueado
+    if (!userUid) return null; // Salir si no hay usuario logueado
+  
+    // Verificar si el jugador pertenece al usuario logueado
+    if (doc.id === userUid) {
+      return {
+        id: doc.data['id'],
+        name: doc.data['name'],
+        surname: doc.data['surname'],
+        age: doc.data['age'],
+        positions: doc.data['positions'],
+        uuid: doc.id
+      };
+    } else {
+      return null; // Devolver null si el jugador no pertenece al usuario logueado
     }
   }
+  
 
   public addPlayer(player:Player):Observable<Player>{
     return from(this.firebaseSvc.createDocument("players", player)).pipe(
@@ -155,8 +191,6 @@ public deletePlayer(player: Player): Observable<Player> {
       })
     ).subscribe({
       next: () => {
-        // Eliminar el jugador del array de jugadores locales
-        this._players.next(this._players.getValue().filter(p => p.uuid !== player.uuid));
         obs.next(player); // Devolver el jugador eliminado en el observable
         obs.complete();
       },

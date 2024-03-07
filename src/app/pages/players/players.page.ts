@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Haptics } from '@capacitor/haptics';
 import { ModalController, ToastController, ToastOptions } from '@ionic/angular';
 import { Player } from 'src/app/core/interfaces/player';
 import { AuthService } from 'src/app/core/services/api/auth.service';
@@ -24,9 +25,10 @@ export class PlayersPage implements OnInit {
 
   ngOnInit(): void {
     this.loading = true;
-    this.players.getAll().subscribe(results=>{
+   /* this.players.getAll().subscribe(results=>{
       this.loading = false;
-    });
+    });*/
+    this.loading = false;
   }
 
 
@@ -36,18 +38,17 @@ export class PlayersPage implements OnInit {
     var _player:Player = {...player};
 
     this.players.deletePlayer(_player).subscribe(
-        {next: player=>{
-        //Notificamos con un Toast que se ha pulsado
+        {next: async player=>{
         const options:ToastOptions = {
-          message:`Player deleted`, //mensaje del toast
-          duration:1000, // 1 segundo
-          position:'bottom', // el toast se situa en la parte inferior
-          color:'danger', // color del toast
-          cssClass:'fav-ion-toast' //Una clase que podemos poner en global.scss para configurar el ion-toast
+          message:`Player deleted`,
+          duration:1000,
+          position:'bottom',
+          color:'danger',
+          cssClass:'fav-ion-toast'
         };
         //creamos el toast
-        this.toast.create(options).then(toast=>toast.present());
-        //this.players.getAll3().subscribe();
+        this.toast.create(options).then(toast=>toast.present(),);
+        await Haptics.notification();
         },
         error: err=>{
           console.log(err);
@@ -70,6 +71,7 @@ export class PlayersPage implements OnInit {
             };
             const toast = await this.toast.create(options);
             toast.present();
+            await Haptics.notification()
           })
         }
         break;
@@ -84,6 +86,7 @@ export class PlayersPage implements OnInit {
           };
           const toast = await this.toast.create(options);
           toast.present();
+          await Haptics.notification()
         })
         }
         break;
@@ -91,7 +94,7 @@ export class PlayersPage implements OnInit {
           console.error("No debería entrar");
         }
       }
-      this.players.getAll().subscribe();
+     // this.players.getAll().subscribe();
 
     }
     this.presentForm(player, onDismiss);
@@ -131,7 +134,8 @@ export class PlayersPage implements OnInit {
             };
             const toast = await this.toast.create(options);
             toast.present();
-            this.players.getAll().subscribe();
+            await Haptics.notification();
+           // this.players.getAll().subscribe();
           })
         }
         break;

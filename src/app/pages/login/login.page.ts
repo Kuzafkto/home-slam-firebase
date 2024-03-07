@@ -5,6 +5,7 @@ import { UserCredentials } from 'src/app/core/interfaces/user-credentials';
 import { UserRegisterInfo } from 'src/app/core/interfaces/user-register-info';
 import { AuthService } from 'src/app/core/services/api/auth.service';
 import { LoginFormComponent } from 'src/app/shared/components/login-form/login-form.component';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,21 @@ import { LoginFormComponent } from 'src/app/shared/components/login-form/login-f
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
+  
+  async activateVibrationWithOptions() {
+    try {
+      const options = {
+        duration: 300, // Duración de la vibración en milisegundos
+        intensity: 0.5 // Intensidad de la vibración, un valor entre 0.1 y 1.0
+      }; //por ahora no usamos las options para vibrate
+  
+      //await Haptics.vibrate();
+      await Haptics.notification()
+      console.log('Vibración activada con éxito con opciones personalizadas');
+    } catch (error) {
+      console.error('Error al activar la vibración:', error);
+    }
+  }
   constructor(
     private auth: AuthService,
     private router: Router,

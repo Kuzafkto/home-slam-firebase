@@ -13,6 +13,7 @@ import { User } from 'src/app/core/interfaces/user';
 import { FirebaseService } from 'src/app/core/services/firebase/firebase.service';
 import { TeamService } from 'src/app/core/services/api/team.service';
 import { Team } from 'src/app/core/interfaces/team';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 
 @Component({
@@ -53,5 +54,17 @@ export class HomePage implements OnInit {
     this.auth.logout();
     this.router.navigate(['/login']);
   }
-
+  async activateVibrationWithOptions() {
+    try {
+      const options = {
+        duration: 3000, // Duración de la vibración en milisegundos
+        intensity: 1.0 // Intensidad de la vibración, un valor entre 0.1 y 1.0
+      };
+  
+      await Haptics.vibrate(options);
+      console.log('Vibración activada con éxito con opciones personalizadas');
+    } catch (error) {
+      console.error('Error al activar la vibración:', error);
+    }
+  }
 }

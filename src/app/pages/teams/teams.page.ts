@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Haptics } from '@capacitor/haptics';
 import { ModalController, ToastController, ToastOptions } from '@ionic/angular';
 import { Team } from 'src/app/core/interfaces/team';
 import { TeamService } from 'src/app/core/services/api/team.service';
@@ -21,10 +22,10 @@ export class TeamsPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.loading = true;
-    this.teams.getAll2().subscribe(results=>{
+    this.loading = false;
+    /*this.teams.getAll().subscribe(results=>{
       this.loading = false;
-    });
+    });*/
   }
 
   onNewteam() {
@@ -42,7 +43,8 @@ export class TeamsPage implements OnInit {
             };
             const toast = await this.toast.create(options);
             toast.present();
-            this.teams.getAll2().subscribe();
+            await Haptics.notification()
+            //this.teams.getAll().subscribe();
           })
         }
         break;
@@ -69,7 +71,8 @@ export class TeamsPage implements OnInit {
             };
             const toast = await this.toast.create(options);
             toast.present();
-            this.teams.getAll2().subscribe();
+            await Haptics.notification()
+           //this.teams.getAll().subscribe();
           })
         }
         break;
@@ -84,7 +87,8 @@ export class TeamsPage implements OnInit {
           };
           const toast = await this.toast.create(options);
           toast.present();
-          this.teams.getAll2().subscribe();
+          await Haptics.notification()
+          //this.teams.getAll().subscribe();
         })
         }
         break;
@@ -92,7 +96,7 @@ export class TeamsPage implements OnInit {
           console.error("No debería entrar");
         }
       }
-      this.teams.getAll2().subscribe();
+      //this.teams.getAll().subscribe();
     }
     this.presentForm(team, onDismiss);
   }
@@ -102,18 +106,18 @@ export class TeamsPage implements OnInit {
     var _team:Team = {...team};
 
     this.teams.deleteTeam(_team).subscribe(
-        {next: team=>{
-        //Notificamos con un Toast que se ha pulsado
+        {next: async team=>{
         const options:ToastOptions = {
-          message:`Team deleted`, //mensaje del toast
-          duration:1000, // 1 segundo
-          position:'bottom', // el toast se situa en la parte inferior
-          color:'danger', // color del toast
-          cssClass:'fav-ion-toast' //Una clase que podemos poner en global.scss para configurar el ion-toast
+          message:`Team deleted`,
+          duration:1000,
+          position:'bottom',
+          color:'danger',
+          cssClass:'fav-ion-toast'
         };
         //creamos el toast
         this.toast.create(options).then(toast=>toast.present());
-        this.teams.getAll().subscribe();
+        await Haptics.notification();
+       // this.teams.getAll().subscribe();
       },
         error: err=>{
           console.log(err);

@@ -1,9 +1,10 @@
 import { Inject, Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, take } from "rxjs";
 import { initializeApp, getApp, FirebaseApp } from "firebase/app";
 import { getFirestore, addDoc, collection, updateDoc, doc, onSnapshot, getDoc, setDoc, query, where, getDocs, Unsubscribe, DocumentData, deleteDoc, Firestore } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL, uploadBytes, FirebaseStorage } from "firebase/storage";
 import { createUserWithEmailAndPassword, deleteUser, signInAnonymously, signOut, signInWithEmailAndPassword, initializeAuth, indexedDBLocalPersistence, UserCredential, Auth, User } from "firebase/auth";
+import { Player } from "../../interfaces/player";
 
 export interface FirebaseStorageFile {
   path: string,
@@ -31,7 +32,10 @@ export class FirebaseService {
   private _user: User | null = null;
   private _isLogged: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public isLogged$: Observable<boolean> = this._isLogged.asObservable();
-
+  private _players: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  public players$: Observable<any[]> = this._players.asObservable();
+  private _teams: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+  public teams$: Observable<any[]> = this._teams.asObservable();
   constructor(
     @Inject('firebase-config') config: any
   ) {
@@ -49,6 +53,11 @@ export class FirebaseService {
       if (user) {
         if (user.uid && user.email) {
           this._isLogged.next(true);
+          //todos los subscribetocollection aqui
+          console.log(user.uid,"yyyyyyyyy",user.email);
+          this.subscribeToUserPlayers( user.uid, this._players, (el: any) => el)
+          this.subscribeToUserTeams(user.uid, this._teams, (el: any) => el,this._players);
+
         }
       } else {
         this._isLogged.next(false);
@@ -332,4 +341,116 @@ export class FirebaseService {
       }
     });
   }
+
+  public async subscribeToUserPlayers(userId: string, subject: BehaviorSubject<any[]>, mapFunction: (el: DocumentData) => any): Promise<Unsubscribe | null> {
+
+    if (!this._db) {
+        return null;
+    }
+
+    try {
+        const docRef = doc(this._db!, "users", userId);
+        const unsubscribeUser = onSnapshot(docRef, async (doc) => {
+            if (doc.exists()) {
+                // jugadores del usuario
+                const userPlayers = doc.get("players") || [];
+                //jugadores que pertenecen al usuario
+                const playerQuery = query(collection(this._db, 'players'), where('__name__', 'in', userPlayers));
+
+                //cambios en la consulta de jugadores
+                const unsubscribePlayers = onSnapshot(playerQuery, async (snapshot) => {
+                    try {
+                        //  datos de los jugadores y meterles  el uid
+                        const players = snapshot.docs.map(doc => {
+                            const playerData = mapFunction(doc.data());
+                            playerData.uuid = doc.id;
+                            return playerData;
+                        });
+                        // actualizar behaviour
+                        subject.next(players);
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }, (error) => {
+                    console.error('Error in onSnapshot:', error);
+                });
+
+                return () => {
+                    unsubscribeUser();
+                    unsubscribePlayers();
+                };
+            } else {
+                console.log('El documento de usuario no existe');
+                return null;
+            }
+        });
+
+        return unsubscribeUser;
+    } catch (error) {
+        console.error('Error:', error);
+        return null;
+    }
+}
+
+
+public async subscribeToUserTeams(userId: string, subject: BehaviorSubject<any[]>, mapFunction: (el: DocumentData) => any, playersSubject: BehaviorSubject<any[]>): Promise<Unsubscribe | null> {
+  if (!this._db) {
+    return null;
+  }
+
+  try {
+    const docRef = doc(this._db!, "users", userId);
+    const unsubscribeUser = onSnapshot(docRef, async (doc) => {
+      if (doc.exists()) {
+        const userTeams = doc.get("teams") || [];
+        // query 
+        const teamQuery = query(collection(this._db, 'teams'), where('__name__', 'in', userTeams));
+
+        //suscribirse a los cambios en los equipos 
+        const unsubscribeTeams = onSnapshot(teamQuery, async (snapshot) => {
+          try {
+            // mapear documentos de equipos a obejtos de equipos
+            const teams = snapshot.docs.map(doc => {
+              // mapeo a los datos del equipo
+              const teamData = mapFunction(doc.data());
+              // id del documento como el campo "uuid"
+              teamData.uuid = doc.id;
+              return teamData;
+            });
+            console.log('Teams:', teams);
+            // obtener jugadores del usuario
+            playersSubject.pipe(take(1)).subscribe(players => {
+              // para cada equipo, filtrar los jugadores del equipo con los jugadores del usuario
+              teams.forEach(team => {
+                const teamPlayers = players.filter(player => team.players.includes(player.uuid));
+                team.players = teamPlayers;
+              });
+              console.log('equipos:', teams);
+              
+              subject.next(teams);
+            });
+
+          } catch (error) {
+            console.error('error:', error);
+          }
+        }, (error) => {
+          console.error('error de snapshot:', error);
+        });
+        return () => {
+          unsubscribeUser(); // desuscribirse de los cambios en el documento del usuario
+          unsubscribeTeams(); // desuscribirse de los cambios en los equipos del usuario
+        };
+      } else {
+        console.log('El documento de usuario no existe');
+        return null; 
+      }
+    });
+
+    return unsubscribeUser;
+  } catch (error) {
+    console.error('error:', error); 
+    return null; // nulo en caso de error
+  }
+}
+
 }
