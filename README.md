@@ -80,5 +80,4 @@ Para el backend está publicado a traves de render la app esta subida a Netlify 
 
 
 ## 🔗 Links
-[![netlify](https://images.crunchbase.com/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qbmz3pgveogtv7np8zyu)](https://homeslam.netlify.app/)
 [![youtube](https://cdn-icons-png.flaticon.com/256/1384/1384060.png)](https://www.youtube.com/watch?v=UnUmfdLU940)
