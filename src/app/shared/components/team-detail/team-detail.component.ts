@@ -207,8 +207,8 @@ export class TeamDetailComponent implements OnInit {
   }
 
   onSubmit() {
-    // Extraer solo los UUID de los jugadores del equipo
-    //const playerUUIDs = Array.from(this.currentTeamPlayers).map(player => player.uuid);
+    // Extraer solo los UUID de los jugadores del equipo  
+   // const playerUUIDs = Array.from(this.currentTeamPlayers).map(player => player.uuid);
   
     // Asignar los UUID de los jugadores al campo 'players' del formulario
     //this.form.controls['players'].setValue(playerUUIDs);

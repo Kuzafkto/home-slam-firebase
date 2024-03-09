@@ -127,8 +127,6 @@ export class TeamService {
     );
   }
 
-
-  
   public addTeam(team: Team): Observable<Team> {
     return from(this.firebaseSvc.createDocument("teams", team)).pipe(
       switchMap((createdDocId: string) => {
@@ -140,18 +138,30 @@ export class TeamService {
               user.teams.push(createdDocId);
               // Actualizar el documento del usuario con el nuevo array de equipos
               return from(this.firebaseSvc.updateDocumentField("users", user.uuid, "teams", user.teams)).pipe(
-                map(() => team) // Devolver el equipo creado después de la actualización
+                switchMap(() => {
+                  // Obtener los UUID de los jugadores del equipo
+                  let playerUUIDs: string[] = [];
+                  team.players.forEach(player => {
+                    if (player.uuid) {
+                      playerUUIDs.push(player.uuid);
+                    }
+                  });
+                  // Actualizar el campo 'players' del documento del equipo con los UUID de los jugadores
+                  return from(this.firebaseSvc.updateDocumentField("teams", createdDocId, "players", playerUUIDs)).pipe(
+                    map(() => team) // Devolver el equipo creado después de la actualización
+                  );
+                })
               );
             } else {
-              return new Observable<Team>(obs => {
-                obs.error(new Error('User does not have UUID'));
-              });
+              return throwError(new Error('User does not have UUID'));
             }
           })
         );
       })
     );
   }
+  
+  
   
   
   
